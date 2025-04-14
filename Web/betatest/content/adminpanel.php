@@ -151,6 +151,7 @@ unset($_SESSION['message_type']);
             <a href="logout.php" class="btn btn-danger">Logout</a>
             <a href="changepassword.php" class="btn btn-warning">Change Password</a>
             <a href="ftp/index.php" class="btn btn-primary">SFTP</a>
+            <a href="ftp/serverstat.php" class="btn btn-primary">Server Status</a>
         </div>
     </header>
     <section class="row">
@@ -228,7 +229,7 @@ unset($_SESSION['message_type']);
     <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
         <span class="text-muted">Developed by Michal Sedlák</span>
         <div class="d-flex gap-3">
-            <a href="https://github.com/michalcz10/USB-RAID-pole" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
                 <img src="../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
                 <img src="../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
             </a>
