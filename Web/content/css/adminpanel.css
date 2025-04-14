@@ -1,0 +1,52 @@
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.custom-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 60%;
+    margin: 0 auto;
+}
+section.row {
+    flex: 1;
+}
+@media (max-width: 1120px) {
+    .custom-container {
+        max-width: 90%;
+    }
+}
+.add-user-form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+.form-check {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-start;
+}
+.form-check-input {
+    margin-right: 10px;
+}
+.form-check-label {
+    margin-left: 0.5rem;
+}
+body {
+    min-width: 800px;
+}
+.hover-effect {
+    transition: opacity 0.3s ease;
+}
+
+.hover-effect:hover {
+    opacity: 0.8;
+}
+.theme-light .dark-logo {
+    display: none;
+}
+.theme-dark .light-logo {
+    display: none;
+}

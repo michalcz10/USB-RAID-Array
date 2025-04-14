@@ -1,0 +1,253 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+#pdfContainer {
+    width: 100%;
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+#loadingMessage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: var(--bs-body-bg);
+}
+[data-bs-theme="dark"] #loadingMessage {
+    background-color: rgba(33, 37, 41, 0.9);
+}
+
+[data-bs-theme="light"] #loadingMessage {
+    background-color: rgba(248, 249, 250, 0.9);
+}
+.page-container {
+    background-color: white;
+    margin: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+canvas {
+    display: block;
+}
+footer {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid #ddd;
+    width: 100%;
+}
+
+.hover-effect {
+    transition: opacity 0.3s ease;
+}
+
+.hover-effect:hover {
+    opacity: 0.8;
+}
+
+.theme-light .dark-logo {
+    display: none;
+}
+
+.theme-dark .light-logo {
+    display: none;
+}
+.file-info table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+.actionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bs-body-bg);
+    z-index: 9999;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.fullscreen-mode header,
+.fullscreen-mode footer,
+.fullscreen-mode .theme-toggle,
+.fullscreen-mode .actionButton {
+    display: none !important;
+}
+
+.fullscreen-mode #pdfContainer {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.fullscreen-mode .controls {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 6px 12px;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    opacity: 0.3;
+    z-index: 1000;
+    border-radius: .375rem;
+    width: auto;
+    max-width: 95%;
+}
+
+.fullscreen-mode .controls:hover {
+    opacity: 1;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.9);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+.fullscreen-mode[data-bs-theme="light"] .btn-light {
+    background-color: rgba(233, 236, 239, 0.7);
+    border-color: rgba(222, 226, 230, 0.7);
+}
+
+.fullscreen-mode[data-bs-theme="dark"] .btn-light {
+    background-color: rgba(52, 58, 64, 0.7);
+    border-color: rgba(73, 80, 87, 0.7);
+}
+.fullscreen-mode .btn-light:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+.fullscreen-mode .btn-light.disabled {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5);
+}
+
+.fullscreen-mode .page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+}
+
+.fullscreen-mode canvas {
+    max-width: 100%;
+    max-height: 100vh;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0;
+    object-fit: contain;
+}
+.fullscreen-mode .btn-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fullscreen-mode .btn-group .btn {
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.fullscreen-mode .btn-group .btn.disabled {
+    min-width: 120px;
+    padding: 6px 12px;
+}
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .fullscreen-mode .controls {
+        bottom: 5px;
+        padding: 4px 8px;
+        width: auto;
+        max-width: calc(100% - 20px);
+    }
+
+    .fullscreen-mode .btn-group .btn {
+        min-width: 36px;
+        padding: 4px 6px;
+    }
+
+    .fullscreen-mode .btn-group .btn.disabled {
+        min-width: 110px;
+        padding: 4px 8px;
+    }
+
+    .fullscreen-mode #pageNum,
+    .fullscreen-mode #pageCount {
+        font-size: 0.875rem;
+        margin: 0 2px;
+    }
+
+    .fullscreen-mode .btn-group {
+        gap: 3px;
+    }
+
+    /* Add spacing between page numbers and "of" text */
+    .fullscreen-mode .btn-light.disabled span {
+        margin: 0 2px;
+    }
+}
+
+/* Theme-specific button styles */
+[data-bs-theme="light"] .btn-light {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #212529;
+}
+
+[data-bs-theme="light"] .btn-light:hover {
+    background-color: #dde2e6;
+    border-color: #ced4da;
+    color: #000;
+}
+
+[data-bs-theme="dark"] .btn-light {
+    background-color: #343a40;
+    border-color: #495057;
+    color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .btn-light:hover {
+    background-color: #495057;
+    border-color: #6c757d;
+    color: #fff;
+}
+
+/* Button group specific styles */
+.btn-group .btn-light {
+    margin: 0 1px;
+}
+
+.btn-group .btn-light.disabled {
+    opacity: 0.8;
+}

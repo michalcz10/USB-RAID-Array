@@ -1,1 +1,2 @@
-# USB-RAID-Array
+# USB-RAID-pole
+Cílem práce je nalézt využití zastaralých paměťových médií jako například slabopaměťové USB flash disky s malou paměťovou kapacitou. Technologii RAID (NAS) pole v praxi implementujte na vícero RAID technologiích a vzájemně komparujte řešení. Komparujte chování navrženého systému minimálně na technologiích RAID 0, RAID 1 a RAID 5. Vytvořte vzdálené připojení na toto RAID pole s možností nahrání a stažení souborů po přihlášení uživatele (web login). K tomuto účelu vytvořte webovou aplikaci. Zabezpečte vzdálené připojení. Použité technologie: RAID, NAS, FTP, USB, Flash, HTML, PHP, MySQL.

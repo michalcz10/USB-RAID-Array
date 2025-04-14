@@ -1,0 +1,54 @@
+.editor-container {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#editor {
+    width: 100%;
+    min-height: 400px;
+    font-family: monospace;
+    padding: 10px;
+    white-space: pre;
+    overflow: auto;
+    resize: vertical;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    padding-left: 55px; /* Make room for line numbers */
+}
+
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 45px;
+    text-align: right;
+    padding: 10px 5px 10px 0;
+    border-right: 1px solid #ccc;
+    color: #999;
+    user-select: none;
+    font-family: monospace;
+    overflow: hidden;
+    z-index: 1;
+    background-color: #f8f9fa; /* Light mode default */
+}
+
+[data-bs-theme="dark"] .line-numbers {
+    background-color: #212529; /* Dark mode background */
+    border-right-color: #495057; /* Darker border for dark mode */
+    color: #6c757d; /* Lighter text for dark mode */
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.readonly-notice {
+    color: #dc3545;
+    font-weight: bold;
+    margin-left: 10px;
+}
