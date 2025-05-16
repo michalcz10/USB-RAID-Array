@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirm_password = htmlspecialchars($_POST['confirm_password']);
         $uname = $_SESSION['uname'];
 
-        if ($new_password !== $confirm_password) {
+        if(!CheckPassword($new_password)) {
+            $message = "New password must be at least 8 characters long, contain at least one number and one uppercase letter!";
+            $messageType = "danger";
+        } else if ($new_password !== $confirm_password) {
             $message = "New passwords do not match!";
             $messageType = "danger";
         } else {
@@ -73,6 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "All fields are required!";
         $messageType = "danger";
     }
+}
+
+function CheckPassword($password) {
+    if (strlen($password) < 8) {
+        return false;
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return false;
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return false;
+    }
+    return true;
 }
 ?>
 

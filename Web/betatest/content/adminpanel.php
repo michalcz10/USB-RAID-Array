@@ -34,6 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($uname) || empty($pswd)) {
             $_SESSION['message'] = 'Error: Username and password are required!';
             $_SESSION['message_type'] = 'error';
+        } else if (!CheckPassword($pswd)) {
+            $_SESSION['message'] = 'Error: Password must be at least 8 characters long, contain at least one number and one uppercase letter!';
+            $_SESSION['message_type'] = 'error';
         } else {
             $sql_check = "SELECT * FROM users WHERE uname = ?";
             $stmt_check = $conn->prepare($sql_check);
@@ -117,6 +120,19 @@ $message = $_SESSION['message'] ?? '';
 $message_type = $_SESSION['message_type'] ?? '';
 unset($_SESSION['message']);
 unset($_SESSION['message_type']);
+
+function CheckPassword($password) {
+    if (strlen($password) < 8) {
+        return false;
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return false;
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return false;
+    }
+    return true;
+}
 ?>
 
 <!DOCTYPE html>
