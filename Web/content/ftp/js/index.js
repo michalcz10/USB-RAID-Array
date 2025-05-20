@@ -236,6 +236,16 @@ function createFile() {
     };
     xhr.send(formData);
 }
+function openRenameModal(name, path) {
+    document.getElementById('originalName').value = name;
+    document.getElementById('fullPath').value = path;
+    document.getElementById('isDirectory').value = name.endsWith('/') ? '1' : '0';
+    document.getElementById('newName').value = name.endsWith('/') ? name.slice(0, -1) : name;
+
+    const renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
+    renameModal.show();
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;

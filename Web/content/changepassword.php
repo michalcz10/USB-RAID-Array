@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $confirm_password = htmlspecialchars($_POST['confirm_password']);
         $uname = $_SESSION['uname'];
 
-        if ($new_password !== $confirm_password) {
+        if(!CheckPassword($new_password)) {
+            $message = "New password must be at least 8 characters long, contain at least one number and one uppercase letter!";
+            $messageType = "danger";
+        } else if ($new_password !== $confirm_password) {
             $message = "New passwords do not match!";
             $messageType = "danger";
         } else {
@@ -73,6 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "All fields are required!";
         $messageType = "danger";
     }
+}
+
+function CheckPassword($password) {
+    if (strlen($password) < 8) {
+        return false;
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return false;
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return false;
+    }
+    return true;
 }
 ?>
 
@@ -140,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
             <span class="text-muted">Developed by Michal Sedlák</span>
             <div class="d-flex gap-3 flex-wrap justify-content-center">
-                <a href="https://github.com/michalcz10/USB-RAID-pole" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
                     <img src="../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
                     <img src="../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
                 </a>
