@@ -24,12 +24,6 @@ a, .nav-link {
     transition: opacity .2s ease-in-out;
 }
 
-[data-bs-theme="dark"] .btn {
-    color: var(--text-dark) !important;
-}
-[data-bs-theme="light"] .btn {
-    color: var(--text-light) !important;
-}
 
 a:hover, .btn:hover, .nav-link:hover {
     opacity: 0.85;
