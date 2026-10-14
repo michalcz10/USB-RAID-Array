@@ -1,12 +1,12 @@
 /* Modern dark theme with blue accents */
 :root {
-    --bg-dark: #0d1117;
+    --bg-dark: #000000;
     --bg-dark2: #1a202c;
     --primary-blue: #3b82f6;
     --text-light: #e5e7eb;
 /* Add dark blue variable */
     --bg-darkblue: #1e3a8a;
-    --container-bg: rgba(0,0,0,0.85);
+    --container-bg: rgba(0,0,0,0.6);
     --container-border: var(--primary-blue);
 }
 
