@@ -1,0 +1,47 @@
+/* Modern dark theme with blue accents */
+:root {
+    --bg-dark: #0d1117;
+    --bg-dark2: #1a202c;
+    --primary-blue: #3b82f6;
+    --text-light: #e5e7eb;
+    --border-radius: .5rem;
+}
+
+body {
+    background: linear-gradient(135deg, var(--bg-dark), var(--bg-dark2));
+    color: var(--text-light);
+    min-height: 100vh;
+    font-family: system-ui, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+a, .btn, .nav-link {
+    color: var(--primary-blue) !important;
+    transition: opacity .2s ease-in-out;
+}
+
+a:hover, .btn:hover, .nav-link:hover {
+    opacity: 0.85;
+}
+
+.dark-box {
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: rgba(20, 20, 30, 0.9) !important;
+    color: var(--text-light) !important;
+    border: none;
+}
+
+.table {
+    color: var(--text-light) !important;
+}
+
+.table th, .table td {
+    border-color: rgba(255,255,255,0.1) !important;
+}

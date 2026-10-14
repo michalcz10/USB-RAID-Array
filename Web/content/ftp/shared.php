@@ -4,20 +4,9 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require 'config.php';
+require_once __DIR__ . '/../../config/config.php';
 
-function getDatabaseConnection() {
-    $servername = "localhost:3306";
-    $username = "UNAME";
-    $password = "PSWD";
-    $db = "usbraidlogin";
-
-    $conn = new mysqli($servername, $username, $password, $db);
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    return $conn;
-}
+// getDatabaseConnection relocated to central config
 
 if (!isset($_GET['token'])) {
     die("Invalid request. No token provided.");
@@ -42,7 +31,7 @@ $downloadAllowed = $share['download_allowed'] == 1;
 $stmt->close();
 
 // Initialize SFTP
-$sftp = initializeSFTP($host, $username, $password);
+$sftp = initializeSFTP();
 
 if (!$sftp->stat($filePath)) {
     die("File not found: $filePath");
@@ -235,7 +224,7 @@ function formatBytes($bytes, $precision = 2) {
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <link rel="stylesheet" href="../../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/view.css">
     <script src="../../js/bootstrap.bundle.js"></script>
@@ -247,7 +236,7 @@ function formatBytes($bytes, $precision = 2) {
         <span id="themeText"></span>
     </button>
 </div>
-<div class="custom-container">
+<div class="custom-container dark-box">
     <header class="row border-bottom m-5">
         <h1>Shared Media</h1>
         <div class="mb-3">

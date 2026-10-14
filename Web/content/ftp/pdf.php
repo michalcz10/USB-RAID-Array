@@ -7,8 +7,8 @@ if(!isset($_SESSION['uname'])){
     exit;
 }
 
-require 'config.php';
-$sftp = initializeSFTP($host, $username, $password);
+require_once __DIR__ . '/../../config/config.php';
+$sftp = initializeSFTP();
 
 if (!isset($_GET['file'])) {
     die("No file specified");
@@ -111,14 +111,14 @@ if (isset($_GET['stream'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Viewer</title>
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <link rel="stylesheet" href="../../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/pdf.css">
     <script src="../../js/bootstrap.bundle.js"></script>
@@ -131,7 +131,7 @@ if (isset($_GET['stream'])) {
         <span id="themeText"></span>
     </button>
 </div>
-<div class="custom-container">
+<div class="custom-container dark-box">
     <header class="text-center border-bottom m-5">
         <h1 class="mb-4">PDF Viewer</h1>
         <div class="mb-3">

@@ -6,10 +6,10 @@ if (!isset($_SESSION['uname'])) {
     exit();
 }
 
-$servername = "localhost:3306";
-$username = "UNAME";
-$password = "PSWD";
-$db = "usbraidlogin";
+require_once __DIR__ . '/../config/config.php';
+// $username = "UNAME";
+// $password = "PSWD";
+// $db = "usbraidlogin";
 
 $message = "";
 $messageType = "";
@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "New passwords do not match!";
             $messageType = "danger";
         } else {
-            $conn = new mysqli($servername, $username, $password, $db);
-            $conn->set_charset("utf8");
+            $conn = getDatabaseConnection();
+            // charset already set in getDatabaseConnection()
 
             if ($conn->connect_error) {
                 $message = "Database connection failed!";

@@ -14,8 +14,8 @@ if(!isset($_SESSION["upPer"]) || $_SESSION["upPer"] != true) {
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require 'config.php';
-$sftp = initializeSFTP($host, $username, $password);
+require_once __DIR__ . '/../../config/config.php';
+$sftp = initializeSFTP();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $oldPath = isset($_POST['path']) ? $_POST['path'] : '';

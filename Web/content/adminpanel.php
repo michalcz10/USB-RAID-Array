@@ -9,13 +9,13 @@ if (empty($_SESSION['admin']) || $_SESSION['admin'] !== true) {
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-$servername = "localhost:3306";
-$username = "UNAME";
-$password = "PSWD";
-$db = "usbraidlogin";
+require_once __DIR__ . '/../config/config.php';
+// $username = "UNAME";
+// $password = "PSWD";
+// $db = "usbraidlogin";
 
-$conn = new mysqli($servername, $username, $password, $db);
-$conn->set_charset("utf8");
+$conn = getDatabaseConnection();
+// charset already set in getDatabaseConnection()
 
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);

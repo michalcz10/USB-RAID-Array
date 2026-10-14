@@ -2,16 +2,16 @@
 session_start();
 
 if (isset($_POST['uname'], $_POST['pswd'])) {
-    $servername = "localhost:3306";
-    $username = "UNAME";
-    $password = "PSWD";
-    $db = "usbraidlogin";
+require_once __DIR__ . '/../config/config.php';
+// $username = "UNAME";
+// $password = "PSWD";
+// $db = "usbraidlogin";
 
     $uname = htmlspecialchars($_POST['uname']);
     $pswd = htmlspecialchars($_POST['pswd']);
 
-    $conn = new mysqli($servername, $username, $password, $db);
-    $conn->set_charset("utf8");
+    $conn = getDatabaseConnection();
+    // charset already set in getDatabaseConnection()
 
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);

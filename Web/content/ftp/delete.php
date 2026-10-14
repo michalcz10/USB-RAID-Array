@@ -1,7 +1,7 @@
 <?php
-require 'config.php';
+require_once __DIR__ . '/../../config/config.php';
 
-$sftp = initializeSFTP($host, $username, $password);
+$sftp = initializeSFTP();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
     $itemToDelete = $_POST['delete'];

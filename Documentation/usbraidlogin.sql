@@ -35,7 +35,7 @@ CREATE TABLE `users` (
   `delPer` tinyint(1) NOT NULL DEFAULT '0',
   `downPer` tinyint(1) NOT NULL DEFAULT '0',
   `upPer` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Vypisuji data pro tabulku `users`

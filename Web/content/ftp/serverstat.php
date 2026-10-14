@@ -12,15 +12,15 @@ if (empty($_SESSION['admin']) || $_SESSION['admin'] !== true) {
     exit();
 }
 
-require '../../vendor/autoload.php';
+require_once __DIR__ . '/../config/config.php';
 
 use phpseclib3\Net\SSH2;
 
-$ssh_host = 'localhost';
-$ssh_username = 'uname';
-$ssh_password = 'pswd';
+// $ssh_host = 'localhost';
+// $ssh_username = 'uname';
+// $ssh_password = 'pswd';
 
-$ssh = new SSH2($ssh_host);
+$ssh = getSSHConnection();
 if (!$ssh->login($ssh_username, $ssh_password)) {
     die('SSH login failed');
 }
@@ -218,13 +218,13 @@ function formatBytes($bytes, $forceUnit = '') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
 <head>
     <title>Server Status</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <link rel="stylesheet" href="../../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/serverstat.css">
     <script src="../../js/bootstrap.bundle.js"></script>
@@ -238,6 +238,7 @@ function formatBytes($bytes, $forceUnit = '') {
     </button>
 </div>
 
+<div class="custom-container dark-box">
 <header class="row border-bottom m-5">
     <h1>Server Status</h1>
     <div class="mb-3 p-3">
@@ -417,6 +418,7 @@ function formatBytes($bytes, $forceUnit = '') {
     </div>
 </div>
 
+</div>
 <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3">
     <span class="text-muted">Developed by Michal Sedlák</span>
     <div class="d-flex gap-3">

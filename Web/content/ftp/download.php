@@ -9,14 +9,14 @@ error_reporting(0);
 ob_start();
 
 try {
-    require 'config.php';
+    require_once __DIR__ . '/../../config/config.php';
 
     $logFile = __DIR__ . '/download_log.txt';
     file_put_contents($logFile, "Download started: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
     
     $sftp = null;
     try {
-        $sftp = initializeSFTP($host, $username, $password);
+        $sftp = initializeSFTP();
         file_put_contents($logFile, "SFTP connection established\n", FILE_APPEND);
     } catch (Exception $e) {
         file_put_contents($logFile, "SFTP connection failed: " . $e->getMessage() . "\n", FILE_APPEND);

@@ -12,8 +12,8 @@ if(!isset($_SESSION['uname'])){
     exit;
 }
 
-require 'config.php';
-$sftp = initializeSFTP($host, $username, $password);
+require_once __DIR__ . '/../../config/config.php';
+$sftp = initializeSFTP();
 
 $filePath = isset($_GET['file']) ? $_GET['file'] : '';
 
@@ -54,13 +54,13 @@ $showLineNumbers = in_array(strtolower($extension), ['php', 'js', 'html', 'css',
 $parentDir = dirname($filePath);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
 <head>
     <title>Edit File - <?= htmlspecialchars($fileName) ?></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
+    <link rel="stylesheet" href="../../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/open.css">
     <script src="../../js/bootstrap.bundle.js"></script>
@@ -72,7 +72,7 @@ $parentDir = dirname($filePath);
         <span id="themeText"></span>
     </button>
 </div>
-    <div class="container mt-4">
+    <div class="custom-container dark-box">
         <div class="header-container">
             <h1>Edit File: <?= htmlspecialchars($fileName) ?></h1>
             <a href="index.php?path=<?= urlencode($parentDir) ?>" class="btn btn-secondary">Back to File List</a>
