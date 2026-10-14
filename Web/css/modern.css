@@ -16,9 +16,13 @@ body {
     padding: 0;
 }
 
-a, .btn, .nav-link {
+a, .nav-link {
     color: var(--primary-blue) !important;
     transition: opacity .2s ease-in-out;
+}
+
+.btn {
+    color: var(--text-light) !important;
 }
 
 a:hover, .btn:hover, .nav-link:hover {
