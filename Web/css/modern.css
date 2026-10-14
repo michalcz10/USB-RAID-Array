@@ -42,6 +42,28 @@ a:hover, .btn:hover, .nav-link:hover {
     color: var(--text-light) !important;
 }
 
-.table th, .table td {
+ .table th, .table td {
     border-color: rgba(255,255,255,0.1) !important;
+}
+
+/* Light mode overrides */
+html[data-bs-theme="light"] {
+    --bg-light: #f8f9fa;
+    --bg-light2: #ffffff;
+    --text-dark: #212529;
+}
+html[data-bs-theme="light"] body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+html[data-bs-theme="light"] .dark-box {
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-dark);
+}
+html[data-bs-theme="light"] .modal-content {
+    background: #fff !important;
+    color: var(--text-dark) !important;
+}
+html[data-bs-theme="light"] .table {
+    color: var(--text-dark) !important;
 }
