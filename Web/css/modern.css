@@ -29,22 +29,14 @@ a:hover, .btn:hover, .nav-link:hover {
     opacity: 0.85;
 }
 
-/* Ensure action buttons have white text for visibility */
-.btn-primary,
-.btn-danger,
-.btn-warning,
-.btn-success,
-.btn-info,
-.btn-secondary {
-    color: var(--text-light) !important;
+/* Ensure modals are on top and not clipped */
+.modal {
+    z-index: 1055 !important;
+}
+.modal-backdrop {
+    z-index: 1050 !important;
 }
 
-/* Override specific actions (update password, upload directory, rename) to have black text */
-.btn-primary,
-.btn-warning,
-.btn-info {
-    color: #212529 !important;
-}
 
 .dark-box {
     background: rgba(0,0,0,0.6);
