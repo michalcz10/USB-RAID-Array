@@ -25,10 +25,10 @@ a, .nav-link {
 }
 
 [data-bs-theme="dark"] .btn {
-    color: var(--text-light) !important;
+    color: var(--text-dark) !important;
 }
 [data-bs-theme="light"] .btn {
-    color: var(--text-dark) !important;
+    color: var(--text-light) !important;
 }
 
 a:hover, .btn:hover, .nav-link:hover {
