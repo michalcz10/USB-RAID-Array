@@ -11,7 +11,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, var(--bg-dark), var(--bg-darkblue));
+    background: linear-gradient(135deg, var(--container-bg-start), var(--bg-darkblue));
     color: var(--text-light);
     min-height: 100vh;
     font-family: system-ui, sans-serif;
@@ -56,7 +56,7 @@ a:hover, .btn:hover, .nav-link:hover {
 /* Main window styling (window within window) */
 .custom-container.dark-box {
     margin: 2rem;
-    background: linear-gradient(135deg, var(--container-bg-start), var(--bg-dark));
+    background: linear-gradient(135deg, var(--container-bg-start), var(--bg-darkblue));
     border: 2px solid var(--container-border);
     border-radius: var(--border-radius);
     padding: 1rem;
