@@ -6,10 +6,12 @@
     --text-light: #e5e7eb;
 /* Add dark blue variable */
     --bg-darkblue: #1e3a8a;
+    --container-bg: rgba(0,0,0,0.85);
+    --container-border: var(--primary-blue);
 }
 
 body {
-    background: var(--bg-dark);
+    background: linear-gradient(135deg, var(--bg-dark), var(--bg-darkblue));
     color: var(--text-light);
     min-height: 100vh;
     font-family: system-ui, sans-serif;
@@ -54,8 +56,8 @@ a:hover, .btn:hover, .nav-link:hover {
 /* Main window styling (window within window) */
 .custom-container.dark-box {
     margin: 2rem;
-    background: linear-gradient(135deg, rgba(13,17,23,0.9), rgba(30,58,138,0.7));
-    border: 2px solid var(--primary-blue);
+    background: var(--container-bg);
+    border: 2px solid var(--container-border);
     border-radius: var(--border-radius);
     padding: 1rem;
     backdrop-filter: blur(6px);
@@ -65,6 +67,8 @@ a:hover, .btn:hover, .nav-link:hover {
 html[data-bs-theme="light"] {
     --bg-light: #f8f9fa;
     --bg-light2: #ffffff;
+    --container-bg: rgba(255,255,255,0.85);
+    --container-border: var(--primary-blue);
     --text-dark: #212529;
 }
 html[data-bs-theme="light"] body {
