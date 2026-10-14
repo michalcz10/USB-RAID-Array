@@ -29,6 +29,16 @@ a:hover, .btn:hover, .nav-link:hover {
     opacity: 0.85;
 }
 
+/* Ensure action buttons have white text for visibility */
+.btn-primary,
+.btn-danger,
+.btn-warning,
+.btn-success,
+.btn-info,
+.btn-secondary {
+    color: var(--text-light) !important;
+}
+
 .dark-box {
     background: rgba(0,0,0,0.6);
     border-radius: var(--border-radius);
