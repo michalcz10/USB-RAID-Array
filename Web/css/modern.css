@@ -4,11 +4,12 @@
     --bg-dark2: #1a202c;
     --primary-blue: #3b82f6;
     --text-light: #e5e7eb;
-    --border-radius: .5rem;
+/* Add dark blue variable */
+    --bg-darkblue: #1e3a8a;
 }
 
 body {
-    background: linear-gradient(135deg, var(--bg-dark), var(--primary-blue));
+    background: var(--bg-dark);
     color: var(--text-light);
     min-height: 100vh;
     font-family: system-ui, sans-serif;
@@ -53,7 +54,7 @@ a:hover, .btn:hover, .nav-link:hover {
 /* Main window styling (window within window) */
 .custom-container.dark-box {
     margin: 2rem;
-    background: linear-gradient(135deg, rgba(0,0,0,0.45), rgba(59,130,246,0.2));
+    background: linear-gradient(135deg, rgba(13,17,23,0.9), rgba(30,58,138,0.7));
     border: 2px solid var(--primary-blue);
     border-radius: var(--border-radius);
     padding: 1rem;
