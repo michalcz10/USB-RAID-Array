@@ -320,6 +320,13 @@
     </footer>
     </div>
     <script>
+        // Keep Bootstrap modals outside the filtered SFTP container. A parent
+        // backdrop-filter creates a stacking context that can block modal input.
+        document.querySelectorAll('.modal').forEach(function (modal) {
+            document.body.appendChild(modal);
+        });
+    </script>
+    <script>
         // Pass PHP variables to JavaScript
         var currentPath = "<?php echo $currentPath; ?>";
     </script>

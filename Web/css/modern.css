@@ -1,17 +1,23 @@
 /* Modern dark theme with blue accents */
 :root {
-    --bg-dark: #000000;
+    --bg-dark: #171b22;
     --bg-dark2: #1a202c;
     --primary-blue: #3b82f6;
     --text-light: #e5e7eb;
-/* Add dark blue variable */
-    --bg-darkblue: #0f172a;
-    --container-bg-start: #2b2b2b;
-    --container-border: var(--primary-blue);
+    --bg-darkblue: #101722;
+    --container-bg-start: #1a2029;
+    --container-bg-end: #151d29;
+    --sftp-bg-start: #151b25;
+    --sftp-bg-end: #101722;
+    --container-border: rgba(77, 145, 255, 0.7);
+    --panel-text: #e5e7eb;
+    --panel-muted: #aab4c3;
+    --control-bg: #101722;
+    --control-border: #39485d;
 }
 
 body {
-    background: linear-gradient(135deg, var(--container-bg-start), var(--bg-darkblue));
+    background: linear-gradient(135deg, var(--bg-dark), var(--bg-darkblue));
     color: var(--text-light);
     min-height: 100vh;
     font-family: system-ui, sans-serif;
@@ -22,6 +28,49 @@ body {
 a, .nav-link {
     color: var(--primary-blue) !important;
     transition: opacity .2s ease-in-out;
+}
+
+body, button, input, select, textarea {
+    font-family: system-ui, sans-serif;
+}
+
+/* Keep text, fields and tables readable on every page that uses the shared theme. */
+.surface-panel,
+.dark-box {
+    color: var(--panel-text);
+}
+
+.surface-panel .text-muted,
+.dark-box .text-muted {
+    color: var(--panel-muted) !important;
+}
+
+.surface-panel .form-control,
+.surface-panel .form-select,
+.dark-box .form-control,
+.dark-box .form-select {
+    color: var(--panel-text);
+    background-color: var(--control-bg);
+    border-color: var(--control-border);
+}
+
+.surface-panel .form-control::placeholder,
+.dark-box .form-control::placeholder {
+    color: var(--panel-muted);
+}
+
+.surface-panel .form-control:focus,
+.surface-panel .form-select:focus,
+.dark-box .form-control:focus,
+.dark-box .form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 .2rem rgba(59, 130, 246, .2);
+}
+
+.surface-panel .table,
+.surface-panel .table th,
+.surface-panel .table td {
+    color: inherit;
 }
 
 
@@ -53,6 +102,14 @@ a:hover, .btn:hover, .nav-link:hover {
     backdrop-filter: blur(8px);
 }
 
+.surface-panel {
+    background: linear-gradient(145deg, var(--sftp-bg-start), var(--sftp-bg-end));
+    color: var(--text-light);
+    border: 1px solid rgba(77, 145, 255, 0.3);
+    border-radius: 1rem;
+    box-shadow: 0 12px 32px rgba(3, 8, 18, 0.2);
+}
+
 .modal-content {
     background: rgba(20, 20, 30, 0.9) !important;
     color: var(--text-light) !important;
@@ -69,8 +126,9 @@ a:hover, .btn:hover, .nav-link:hover {
 
 /* Main window styling (window within window) */
 .custom-container.dark-box {
-    margin: 2rem;
-    background: linear-gradient(135deg, var(--container-bg-start), var(--bg-darkblue));
+    box-sizing: border-box;
+    margin: 2rem auto;
+    background: linear-gradient(135deg, var(--container-bg-start), var(--container-bg-end));
     border: 2px solid var(--container-border);
     border-radius: var(--border-radius);
     padding: 1rem;
@@ -84,6 +142,10 @@ html[data-bs-theme="light"] {
     --container-bg: rgba(255,255,255,0.85);
     --container-border: var(--primary-blue);
     --text-dark: #212529;
+    --panel-text: #212529;
+    --panel-muted: #596579;
+    --control-bg: #ffffff;
+    --control-border: #c8d2df;
 }
 html[data-bs-theme="light"] body {
     background: var(--bg-light);
@@ -92,6 +154,23 @@ html[data-bs-theme="light"] body {
 html[data-bs-theme="light"] .dark-box {
     background: rgba(255, 255, 255, 0.8);
     color: var(--text-dark);
+}
+html[data-bs-theme="light"] .surface-panel .form-control,
+html[data-bs-theme="light"] .surface-panel .form-select,
+html[data-bs-theme="light"] .dark-box .form-control,
+html[data-bs-theme="light"] .dark-box .form-select {
+    color: var(--panel-text);
+    background-color: var(--control-bg);
+    border-color: var(--control-border);
+}
+html[data-bs-theme="light"] .form-control::placeholder {
+    color: var(--panel-muted);
+}
+html[data-bs-theme="light"] .surface-panel {
+    background: linear-gradient(145deg, #ffffff, #edf2f8);
+    color: var(--text-dark);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 12px 32px rgba(31, 58, 92, 0.08);
 }
 html[data-bs-theme="light"] .modal-content {
     background: #fff !important;

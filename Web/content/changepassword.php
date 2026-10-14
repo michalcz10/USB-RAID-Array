@@ -99,6 +99,7 @@ function CheckPassword($password) {
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/changepassword.css">
     <script src="../js/bootstrap.bundle.js"></script>
@@ -111,7 +112,7 @@ function CheckPassword($password) {
         </button>
     </div>
     
-    <div class="container-fluid">
+    <div class="custom-container dark-box">
         <header class="row border-bottom my-3 my-md-5">
             <h1>USB RAID Array</h1>
             <div class="mb-3 p-3">
@@ -126,7 +127,7 @@ function CheckPassword($password) {
         </header>
         
         <section class="row content-section">
-            <article class="col-12 border border-2 border-primary rounded p-2 p-md-4">
+            <article class="col-12 border border-2 border-primary rounded p-2 p-md-4 surface-panel">
                 <h2 class="mb-4">Change Password</h2>
                 
                 <?php if ($message): ?>

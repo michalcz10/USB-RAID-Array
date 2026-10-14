@@ -141,6 +141,7 @@ function CheckPassword($password) {
     <title>Admin Panel</title>
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../css/bootstrap.css">
+    <link rel="stylesheet" href="../css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/adminpanel.css">
     <script src="../js/bootstrap.bundle.js"></script>
@@ -160,7 +161,7 @@ function CheckPassword($password) {
     </button>
 </div>
 
-<div class="custom-container">
+<div class="custom-container dark-box">
     <header class="row border-bottom m-5">
         <h1>USB RAID Array</h1>
         <div class="mb-3 p-3">
@@ -171,7 +172,7 @@ function CheckPassword($password) {
         </div>
     </header>
     <section class="row">
-        <article class="col border border-2 border-primary rounded p-2">
+        <article class="col border border-2 border-primary rounded p-2 surface-panel">
             <h2 class="mb-4">User Management</h2>
             <?php if ($message): ?>
                 <div class="alert alert-<?php echo $message_type === 'success' ? 'success' : 'danger'; ?>">

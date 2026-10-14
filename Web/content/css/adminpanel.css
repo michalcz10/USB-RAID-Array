@@ -10,12 +10,29 @@ html, body {
     max-width: 60%;
     margin: 0 auto;
 }
+.custom-container.dark-box {
+    min-height: calc(100vh - 4rem);
+    width: min(60%, 1200px);
+}
 section.row {
     flex: 1;
 }
 @media (max-width: 1120px) {
     .custom-container {
         max-width: 90%;
+    }
+    .custom-container.dark-box {
+        width: 90%;
+    }
+}
+@media (max-width: 700px) {
+    .custom-container.dark-box {
+        width: calc(100% - 2rem);
+        min-height: calc(100vh - 2rem);
+        margin: 1rem auto;
+    }
+    body {
+        min-width: 0;
     }
 }
 .add-user-form {
@@ -33,9 +50,6 @@ section.row {
 }
 .form-check-label {
     margin-left: 0.5rem;
-}
-body {
-    min-width: 800px;
 }
 .hover-effect {
     transition: opacity 0.3s ease;

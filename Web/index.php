@@ -22,6 +22,7 @@ if (empty($_SESSION)) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/modern.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/index.css">
     <script src="js/bootstrap.bundle.js"></script>
@@ -34,13 +35,14 @@ if (empty($_SESSION)) {
         </button>
     </div>
     
+    <div class="custom-container dark-box">
     <header class="row border-bottom m-5">
         <h1>USB RAID Array</h1>
     </header>
 
     <main>
         <section class="row m-3">
-            <article class="col border border-2 border-primary rounded p-2 fixed">
+            <article class="col border border-2 border-primary rounded p-2 fixed surface-panel">
                 <form action="content/login.php" method="post">
                     <div class="mb-3">
                         <label for="uname">Username:</label>
@@ -73,6 +75,7 @@ if (empty($_SESSION)) {
             </a>
         </div>
     </footer>
+    </div>
     
     <script src="js/theme.js"></script>
 </body>
