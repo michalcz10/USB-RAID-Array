@@ -24,8 +24,11 @@ a, .nav-link {
     transition: opacity .2s ease-in-out;
 }
 
-.btn {
+[data-bs-theme="dark"] .btn {
     color: var(--text-light) !important;
+}
+[data-bs-theme="light"] .btn {
+    color: var(--text-dark) !important;
 }
 
 a:hover, .btn:hover, .nav-link:hover {
