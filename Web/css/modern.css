@@ -39,6 +39,13 @@ a:hover, .btn:hover, .nav-link:hover {
     color: var(--text-light) !important;
 }
 
+/* Override specific actions (update password, upload directory, rename) to have black text */
+.btn-primary,
+.btn-warning,
+.btn-info {
+    color: #212529 !important;
+}
+
 .dark-box {
     background: rgba(0,0,0,0.6);
     border-radius: var(--border-radius);
