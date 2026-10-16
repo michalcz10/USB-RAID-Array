@@ -1,86 +1,11 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    overflow-x: hidden;
-}
-
-.custom-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    max-width: 100%;
-}
-
-.media-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 100%;
-    max-height: 80vh;
-    margin: 0 auto;
-    overflow: visible;
-    flex-direction: column;
-}
-
-.media-container img {
-    max-width: 100%;
-    max-height: 70vh;
-    object-fit: contain;
-}
-
-.media-container video {
-    max-width: 100%;
-    max-height: 70vh;
-}
-
-.media-container audio {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px 0;
-}
-
-.controls {
-    margin: 20px 0;
-    text-align: center;
-}
-
-footer {
-    margin-top: auto;
-    padding: 20px;
-    border-top: 1px solid #ddd;
-    width: 100%;
-}
-
-.hover-effect {
-    transition: opacity 0.3s ease;
-}
-
-.hover-effect:hover {
-    opacity: 0.8;
-}
-
-.theme-light .dark-logo {
-    display: none;
-}
-
-.theme-dark .light-logo {
-    display: none;
-}
-.file-info table {
-    table-layout: fixed;
-    word-wrap: break-word;
-}
-
-@media (max-width: 576px) {
-    .file-info table {
-        width: 95% !important;
-    }
-    .file-info th {
-        width: 40%;
-    }
-    .file-info td {
-        width: 60%;
-    }
-}
+.media-container { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:12px; padding:24px; background:var(--bg); border:1px solid var(--line); border-radius:10px; min-height:200px; }
+.media-container img,.media-container video { display:block; max-width:100%; max-height:65vh; object-fit:contain; flex-basis:100%; }
+.media-container audio { display:block; width:100%; max-width:680px; margin:28px auto; flex-basis:100%; }
+.media-container .btn { margin:0; }
+.file-info { max-width:760px; }
+.file-info h4 { font-size:16px; }
+.file-info table { width:100%; table-layout:fixed; }
+.file-info th { width:160px; }
+.file-info td { overflow-wrap:anywhere; font-size:12px; }
+.media-page .input-group { flex-wrap:wrap; } .media-page .input-group input { flex:1; min-width:160px; }
+@media(max-width:600px) { .media-container { padding:12px; } .file-info th { width:110px; } }

@@ -8,6 +8,7 @@ if(!isset($_SESSION['uname'])){
 }
 
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/workspace.php';
 $sftp = initializeSFTP();
 
 if (!isset($_GET['file'])) {
@@ -38,11 +39,11 @@ if (isset($_GET['stream'])) {
         $matches = [];
         if (preg_match('/bytes=(\d+)-(\d*)/', $rangeHeader, $matches)) {
             $start = intval($matches[1]);
-            
+
             if (!empty($matches[2])) {
                 $end = intval($matches[2]);
             }
-            
+
             $length = $end - $start + 1;
 
             header('HTTP/1.1 206 Partial Content');
@@ -77,13 +78,13 @@ if (isset($_GET['stream'])) {
             $readSize = min($chunkSize, $bytesRemaining);
 
             $chunkData = $sftp->get($filePath, false, $currentPosition, $readSize);
-            
+
             if ($chunkData !== false) {
                 $bytesSent = strlen($chunkData);
                 echo $chunkData;
                 $bytesRemaining -= $bytesSent;
                 $currentPosition += $bytesSent;
-                
+
                 if (ob_get_level()) {
                     ob_flush();
                 }
@@ -111,35 +112,34 @@ if (isset($_GET['stream'])) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Viewer</title>
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
-    <link rel="stylesheet" href="../../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/pdf.css">
-    <script src="../../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'content/ftp/css/pdf.css') ?>">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.js"></script>
+    <script src="<?= workspaceAsset('../../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../../', 'js/ui.js') ?>" defer></script>
 </head>
-<body>
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
-<div class="custom-container dark-box">
-    <header class="text-center border-bottom m-5">
-        <h1 class="mb-4">PDF Viewer</h1>
-        <div class="mb-3">
-            <a href="index.php?path=<?= urlencode(dirname($filePath)) ?>" class="btn btn-primary">Back to Files</a>
-        </div>
-    </header>
+<?php renderWorkspaceStart([
+    'root' => '../../',
+    'active' => 'files',
+    'section' => 'PDF viewer',
+    'eyebrow' => 'Document preview',
+    'title' => $fileName,
+    'description' => 'Browse your document without leaving the workspace.',
+    'connected' => true,
+    'back' => 'index.php?path=' . urlencode(dirname($filePath)),
+    'class' => 'pdf-page',
+]); ?>
 
+
+<section class="content-panel pdf-workspace" aria-label="PDF document">
     <div id="pdfContainer" class="container-fluid position-relative">
         <div id="loadingMessage" class="d-flex align-items-center justify-content-center w-100 h-100">
             <div class="bg-dark bg-opacity-75 text-white p-3 rounded">
@@ -151,17 +151,17 @@ if (isset($_GET['stream'])) {
 
     <div class="controls">
         <div class="btn-group" role="group" aria-label="PDF Navigation">
-            <button id="prev" class="btn btn-light border">
-                <i class="bi bi-chevron-left"></i> Previous
+            <button id="prev" class="btn btn-light border" disabled>
+                <i class="ui-icon icon-chevron-left"></i> Previous
             </button>
-            <button class="btn btn-light border disabled">
+            <span class="btn btn-light border" role="status">
                 Page <span id="pageNum"></span> of <span id="pageCount"></span>
+            </span>
+            <button id="next" class="btn btn-light border" disabled>
+                Next <i class="ui-icon icon-chevron-right"></i>
             </button>
-            <button id="next" class="btn btn-light border">
-                Next <i class="bi bi-chevron-right"></i>
-            </button>
-            <button id="fullscreen" class="btn btn-light border">
-                <i class="bi bi-fullscreen"></i>
+            <button id="fullscreen" aria-label="Toggle fullscreen" class="btn btn-light border">
+                <i class="ui-icon icon-fullscreen"></i>
             </button>
         </div>
     </div>
@@ -171,26 +171,14 @@ if (isset($_GET['stream'])) {
         <?php endif; ?>
     </div>
 
-    <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-        <span class="text-muted">Developed by Michal Sedlák</span>
-        <div class="d-flex gap-3">
-            <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-                <img src="../../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-            </a>
-            <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-                <img src="../../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-            </a>
-        </div>
-    </footer>
-</div>
+    </section>
+<?php renderWorkspaceEnd(); ?>
 
         <script>
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    
+
             const url = 'pdf.php?file=<?= urlencode($filePath) ?>&stream=1';
-            const pdfFileName = '<?= htmlspecialchars($fileName) ?>';
+            const pdfFileName = <?= json_encode($fileName, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             let currentPage = 1;
             let pdfDoc = null;
 
@@ -198,46 +186,47 @@ if (isset($_GET['stream'])) {
                 getStorageKey() {
                     return `pdf_page_${pdfFileName}`;
                 },
-                
+
                 savePage(pageNum) {
                     localStorage.setItem(this.getStorageKey(), pageNum.toString());
                 },
-                
+
                 loadPage() {
                     return parseInt(localStorage.getItem(this.getStorageKey())) || 1;
                 }
             };
-    
+
             async function loadPDF() {
                 try {
                     pdfDoc = await pdfjsLib.getDocument(url).promise;
                     document.getElementById('pageCount').textContent = pdfDoc.numPages;
 
                     currentPage = Math.min(PdfPageStorage.loadPage(), pdfDoc.numPages);
-                    
-                    renderPage(currentPage);
-                    document.getElementById('loadingMessage').classList.add('d-none');
+
+                    await renderPage(currentPage);
                 } catch (error) {
                     console.error('Error loading PDF:', error);
                     const loadingMessage = document.getElementById('loadingMessage');
-                    loadingMessage.querySelector('div').classList.add('bg-danger');
-                    loadingMessage.querySelector('div').innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error loading PDF';
+                    if (loadingMessage) {
+                        loadingMessage.querySelector('div').className = 'alert alert-danger';
+                        loadingMessage.querySelector('div').textContent = 'Unable to load this PDF.';
+                    }
                 }
             }
-    
+
             async function renderPage(pageNumber) {
                 const page = await pdfDoc.getPage(pageNumber);
                 const pageContainer = document.createElement('div');
                 pageContainer.className = 'page-container';
-            
-                const windowWidth = window.innerWidth;
+
+                const windowWidth = document.getElementById('pdfContainer').clientWidth - 32;
                 const windowHeight = window.innerHeight;
                 const viewport = page.getViewport({ scale: 1.0 });
-                
+
                 const pixelRatio = window.devicePixelRatio || 1;
                 const widthScale = (windowWidth / viewport.width);
                 const heightScale = (windowHeight / viewport.height);
-                
+
                 let scale;
                 if (isFullscreen) {
                     scale = Math.min(widthScale, heightScale) * 0.95;
@@ -246,28 +235,30 @@ if (isset($_GET['stream'])) {
                 } else {
                     scale = Math.min(widthScale, heightScale, 2);
                 }
-                
+
                 const scaledViewport = page.getViewport({ scale: scale * pixelRatio });
-                
+
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
-                
+
                 canvas.height = scaledViewport.height;
                 canvas.width = scaledViewport.width;
-                
+
                 canvas.style.width = `${scaledViewport.width / pixelRatio}px`;
                 canvas.style.height = `${scaledViewport.height / pixelRatio}px`;
-            
+
                 pageContainer.appendChild(canvas);
                 document.getElementById('pdfContainer').innerHTML = '';
                 document.getElementById('pdfContainer').appendChild(pageContainer);
                 document.getElementById('pageNum').textContent = pageNumber;
-            
+                document.getElementById('prev').disabled = pageNumber <= 1;
+                document.getElementById('next').disabled = pageNumber >= pdfDoc.numPages;
+
                 await page.render({
                     canvasContext: context,
                     viewport: scaledViewport // Use scaledViewport instead of viewport
                 }).promise;
-            
+
                 PdfPageStorage.savePage(pageNumber);
             }
             document.getElementById('prev').addEventListener('click', () => {
@@ -276,9 +267,9 @@ if (isset($_GET['stream'])) {
                     renderPage(currentPage);
                 }
             });
-    
+
             document.getElementById('next').addEventListener('click', () => {
-                if (currentPage < pdfDoc.numPages) {
+                if (pdfDoc && currentPage < pdfDoc.numPages) {
                     currentPage++;
                     renderPage(currentPage);
                 }
@@ -290,14 +281,14 @@ if (isset($_GET['stream'])) {
                 } else if (e.key === 'ArrowLeft' && currentPage > 1) {
                     currentPage--;
                     renderPage(currentPage);
-                } else if (e.key === 'ArrowRight' && currentPage < pdfDoc.numPages) {
+                } else if (e.key === 'ArrowRight' && pdfDoc && currentPage < pdfDoc.numPages) {
                     currentPage++;
                     renderPage(currentPage);
                 }
             });
-    
+
             window.addEventListener('resize', () => {
-                if (currentPage) {
+                if (pdfDoc) {
                     renderPage(currentPage);
                 }
             });
@@ -305,28 +296,28 @@ if (isset($_GET['stream'])) {
             let isFullscreen = false;
 
             document.getElementById('fullscreen').addEventListener('click', () => {
-                const container = document.querySelector('.custom-container');
+                const container = document.querySelector('.pdf-workspace');
                 const fullscreenBtn = document.getElementById('fullscreen');
                 const fullscreenIcon = fullscreenBtn.querySelector('i');
-                
+
                 if (!isFullscreen) {
                     container.classList.add('fullscreen-mode');
                     document.body.style.overflow = 'hidden';
-                    fullscreenIcon.classList.remove('bi-fullscreen');
-                    fullscreenIcon.classList.add('bi-fullscreen-exit');
+                    fullscreenIcon.classList.remove('icon-fullscreen');
+                    fullscreenIcon.classList.add('icon-fullscreen-exit');
                 } else {
                     container.classList.remove('fullscreen-mode');
                     document.body.style.overflow = '';
-                    fullscreenIcon.classList.remove('bi-fullscreen-exit');
-                    fullscreenIcon.classList.add('bi-fullscreen');
+                    fullscreenIcon.classList.remove('icon-fullscreen-exit');
+                    fullscreenIcon.classList.add('icon-fullscreen');
                 }
-                
+
                 isFullscreen = !isFullscreen;
-                renderPage(currentPage);
+                if (pdfDoc) renderPage(currentPage);
             });
-                
+
             loadPDF();
         </script>
-    <script src="../../js/theme.js"></script>
+
 </body>
 </html>

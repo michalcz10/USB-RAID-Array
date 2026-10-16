@@ -158,6 +158,10 @@ function uploadFiles(files) {
         }
     };
 
+    uploadStatus.setAttribute('role', 'status');
+    xhr.upload.addEventListener('progress', event => {
+        if (event.lengthComputable) uploadStatus.textContent = 'Uploading ' + filesAdded + ' file(s) · ' + Math.round(event.loaded / event.total * 100) + '%';
+    });
     xhr.send(formData);
 }
 
@@ -178,8 +182,7 @@ function createDirectory() {
     xhr.onload = () => {
         if (xhr.status === 200) {
             alert('Directory created successfully!');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('createDirModal'));
-            if (modal) modal.hide();
+            document.getElementById('createDirModal').close();
             window.location.reload();
         } else {
             alert('Failed to create directory: ' + xhr.responseText || xhr.statusText);
@@ -221,8 +224,7 @@ function createFile() {
                 const response = JSON.parse(xhr.responseText);
                 if (response.success) {
                     alert('File created successfully!');
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('createFileModal'));
-                    if (modal) modal.hide();
+                    document.getElementById('createFileModal').close();
                     window.location.reload();
                 } else {
                     alert('Failed to create file: ' + (response.message || 'Unknown error'));
@@ -236,53 +238,36 @@ function createFile() {
     };
     xhr.send(formData);
 }
-function openRenameModal(name, path) {
+function openRenameModal(name, path, isDirectory = false) {
     document.getElementById('originalName').value = name;
     document.getElementById('fullPath').value = path;
-    document.getElementById('isDirectory').value = name.endsWith('/') ? '1' : '0';
+    document.getElementById('isDirectory').value = isDirectory ? '1' : '0';
     document.getElementById('newName').value = name.endsWith('/') ? name.slice(0, -1) : name;
 
-    const renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
-    renameModal.show();
+    document.getElementById('renameModal').showModal();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const themeText = document.getElementById('themeText');
-    const themeIcon = themeToggle.querySelector('.bi');
-    
-    function setTheme(theme) {
-        html.setAttribute('data-bs-theme', theme);
-        document.body.classList.remove('theme-light', 'theme-dark');
-        document.body.classList.add('theme-' + theme);
-        localStorage.setItem('theme', theme);
-        
-        if (theme === 'dark') {
-            themeText.textContent = 'Light Mode';
-            themeIcon.className = 'bi bi-sun';
-            themeToggle.classList.remove('btn-dark');
-            themeToggle.classList.add('btn-light');
-        } else {
-            themeText.textContent = 'Dark Mode';
-            themeIcon.className = 'bi bi-moon';
-            themeToggle.classList.remove('btn-light');
-            themeToggle.classList.add('btn-dark');
-        }
-    }
-    
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-        setTheme(savedTheme);
-    } else {
-        setTheme(prefersDark ? 'dark' : 'light');
-    }
-    
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = html.getAttribute('data-bs-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
+
+// Filtering is local to the current directory; no remote request is needed.
+const search = document.getElementById('fileSearch');
+const typeFilter = document.getElementById('typeFilter');
+function filterFiles() {
+    const query = search.value.trim().toLocaleLowerCase();
+    const rows = [...document.querySelectorAll('[data-file-name]')];
+    let visible = 0;
+    rows.forEach(row => {
+        row.hidden = !row.dataset.fileName.toLocaleLowerCase().includes(query) || (typeFilter.value !== 'all' && row.dataset.kind !== typeFilter.value);
+        if (!row.hidden) visible++;
     });
+    document.getElementById('fileCount').textContent = visible + ' of ' + rows.length + ' items';
+    document.getElementById('emptySearch').hidden = visible !== 0;
+}
+search?.addEventListener('input', filterFiles);
+typeFilter?.addEventListener('change', filterFiles);
+if (search) filterFiles();
+document.addEventListener('keydown', event => {
+    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !event.target.closest('input, textarea, select, [contenteditable], dialog')) {
+        event.preventDefault();
+        search?.focus();
+    }
 });

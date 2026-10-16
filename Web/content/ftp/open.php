@@ -13,6 +13,7 @@ if(!isset($_SESSION['uname'])){
 }
 
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/workspace.php';
 $sftp = initializeSFTP();
 
 $filePath = isset($_GET['file']) ? $_GET['file'] : '';
@@ -37,7 +38,7 @@ if (!empty($filePath) && $sftp->file_exists($filePath) && !$sftp->is_dir($filePa
                 $saveError = "Failed to save changes. Check permissions.";
             }
         }
-        
+
         $content = $sftp->get($filePath);
         if ($content === false) {
             $error = "Failed to read file contents.";
@@ -54,42 +55,41 @@ $showLineNumbers = in_array(strtolower($extension), ['php', 'js', 'html', 'css',
 $parentDir = dirname($filePath);
 ?>
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
+<html lang="en">
 <head>
     <title>Edit File - <?= htmlspecialchars($fileName) ?></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
-    <link rel="stylesheet" href="../../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/open.css">
-    <script src="../../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'content/ftp/css/open.css') ?>">
+    <script src="<?= workspaceAsset('../../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../../', 'js/ui.js') ?>" defer></script>
 </head>
-<body>
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
-    <div class="custom-container dark-box">
-        <div class="header-container">
-            <h1>Edit File: <?= htmlspecialchars($fileName) ?></h1>
-            <a href="index.php?path=<?= urlencode($parentDir) ?>" class="btn btn-secondary">Back to File List</a>
-        </div>
-        
+<?php renderWorkspaceStart([
+    'root' => '../../',
+    'active' => 'files',
+    'section' => 'File editor',
+    'eyebrow' => 'File editor',
+    'title' => $fileName,
+    'description' => 'View and edit text files in your remote workspace.',
+    'connected' => true,
+    'back' => 'index.php?path=' . urlencode($parentDir),
+    'class' => 'editor-page',
+]); ?>
+<section class="content-panel">
         <?php if (isset($error)): ?>
             <div class="alert alert-danger"><?= $error ?></div>
         <?php elseif ($editable): ?>
             <?php if (isset($saveSuccess)): ?>
                 <div class="alert alert-success">File saved successfully!</div>
             <?php endif; ?>
-            
+
             <?php if (isset($saveError)): ?>
                 <div class="alert alert-danger"><?= $saveError ?></div>
             <?php endif; ?>
-            
+
             <form method="POST" id="editorForm">
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -105,7 +105,7 @@ $parentDir = dirname($filePath);
                         <textarea id="editor" name="content" class="form-control" <?= (!isset($_SESSION["upPer"]) || $_SESSION["upPer"] != true) ? 'readonly' : '' ?>><?= htmlspecialchars($content) ?></textarea>
                     </div>
                 </div>
-                
+
                 <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true): ?>
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -113,54 +113,55 @@ $parentDir = dirname($filePath);
                 <?php endif; ?>
             </form>
         <?php endif; ?>
-    </div>
-    <script src="../../js/theme.js"></script>
+</section>
+<?php renderWorkspaceEnd(); ?>
+
     <script>
         function updateLineNumbers() {
             const editor = document.getElementById('editor');
             const lineNumbers = document.getElementById('lineNumbers');
-            
+
             if (!lineNumbers) return;
-            
+
             const lines = editor.value.split('\n');
             const lineCount = lines.length;
-            
+
             let html = '';
             for (let i = 1; i <= lineCount; i++) {
                 html += i + '<br>';
             }
-            
+
             lineNumbers.innerHTML = html;
 
             syncLineNumbersHeight();
             lineNumbers.scrollTop = editor.scrollTop;
         }
-        
+
         function syncLineNumbersHeight() {
             const editor = document.getElementById('editor');
             const lineNumbers = document.getElementById('lineNumbers');
-            
+
             if (!lineNumbers || !editor) return;
 
             lineNumbers.style.height = editor.clientHeight + 'px';
         }
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const editor = document.getElementById('editor');
             const lineNumbers = document.getElementById('lineNumbers');
-            
+
             if (editor && lineNumbers) {
                 setTimeout(() => {
                     updateLineNumbers();
                     syncLineNumbersHeight();
                 }, 0);
-                
+
                 editor.addEventListener('input', updateLineNumbers);
 
                 editor.addEventListener('keydown', function(e) {
                     if (e.key === 'Tab') {
                         e.preventDefault();
-                        
+
                         const start = this.selectionStart;
                         const end = this.selectionEnd;
 
@@ -183,10 +184,10 @@ $parentDir = dirname($filePath);
                 const observer = new MutationObserver(function(mutations) {
                     syncLineNumbersHeight();
                 });
-                
-                observer.observe(editor, { 
-                    attributes: true, 
-                    attributeFilter: ['style'] 
+
+                observer.observe(editor, {
+                    attributes: true,
+                    attributeFilter: ['style']
                 });
 
                 if (typeof ResizeObserver === 'function') {

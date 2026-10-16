@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/workspace.php';
 
 // getDatabaseConnection relocated to central config
 
@@ -98,11 +99,11 @@ if (isset($_GET['stream'])) {
         $matches = [];
         if (preg_match('/bytes=(\d+)-(\d*)/', $rangeHeader, $matches)) {
             $start = intval($matches[1]);
-            
+
             if (!empty($matches[2])) {
                 $end = intval($matches[2]);
             }
-            
+
             $length = $end - $start + 1;
 
             header('HTTP/1.1 206 Partial Content');
@@ -135,13 +136,13 @@ if (isset($_GET['stream'])) {
 
             $readSize = min($chunkSize, $bytesRemaining);
             $chunkData = $sftp->get($filePath, false, $currentPosition, $readSize);
-            
+
             if ($chunkData !== false) {
                 $bytesSent = strlen($chunkData);
                 echo $chunkData;
                 $bytesRemaining -= $bytesSent;
                 $currentPosition += $bytesSent;
-                
+
                 if (ob_get_level()) {
                     ob_flush();
                 }
@@ -175,25 +176,25 @@ if (isset($_GET['download'])) {
     if (!$downloadAllowed) {
         die("Download not permitted for this share.");
     }
-    
+
     // Download file code similar to download.php
     header("Content-Type: application/octet-stream");
     header("Content-Disposition: attachment; filename=\"$fileName\"");
     header("Content-Length: $fileSize");
-    
+
     $minChunkSize = 64 * 1024;
     $maxChunkSize = 2 * 1024 * 1024;
     $chunkSize = 256 * 1024;
-    
+
     $currentPosition = 0;
     $bytesRemaining = $fileSize;
-    
+
     set_time_limit(0);
-    
+
     while ($bytesRemaining > 0) {
         $readSize = min($chunkSize, $bytesRemaining);
         $chunkData = $sftp->get($filePath, false, $currentPosition, $readSize);
-        
+
         if ($chunkData !== false) {
             $bytesRead = strlen($chunkData);
             echo $chunkData;
@@ -218,35 +219,32 @@ function formatBytes($bytes, $precision = 2) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
+<html lang="en">
 <head>
     <title>Shared Media - <?= htmlspecialchars($fileName) ?></title>
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
-    <link rel="stylesheet" href="../../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/view.css">
-    <script src="../../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'content/ftp/css/view.css') ?>">
+    <script src="<?= workspaceAsset('../../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../../', 'js/ui.js') ?>" defer></script>
 </head>
-<body class="text-center">
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
-<div class="custom-container dark-box">
-    <header class="row border-bottom m-5">
-        <h1>Shared Media</h1>
-        <div class="mb-3">
-            <span class="badge bg-info">Shared Link</span>
-            <p class="text-muted small">This link will expire on <?= date('F j, Y, g:i a', strtotime($share['expiration'])) ?></p>
-        </div>
-    </header>
+<?php renderWorkspaceStart([
+    'root' => '../../',
+    'active' => 'shared',
+    'section' => 'Shared file',
+    'eyebrow' => 'Shared with you',
+    'title' => $fileName,
+    'description' => 'Preview and access the file shared with you.',
+    'guest' => true,
+    'class' => 'media-page',
+]); ?>
 
-    <section class="row">
+
+<div class="content-toolbar"><span class="badge">Shared link</span><p>Available until <?= htmlspecialchars(date('F j, Y, g:i a', strtotime($share['expiration']))) ?></p></div>
+    <section class="content-panel media-panel">
         <article class="col-12">
             <div class="media-container position-relative">
                 <?php if ($isImage): ?>
@@ -293,33 +291,20 @@ function formatBytes($bytes, $precision = 2) {
         </article>
     </section>
 
-    <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-        <span class="text-muted">Developed by Michal Sedlák</span>
-        <div class="d-flex gap-3">
-            <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-                <img src="../../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-            </a>
-            <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-                <img src="../../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-            </a>
-        </div>
-    </footer>
-</div>
+    <?php renderWorkspaceEnd(); ?>
 
-<script src="../../js/theme.js"></script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const mediaElement = document.querySelector('video, audio');
-    
+
     if (mediaElement) {
         const savedVolume = localStorage.getItem('mediaVolume');
         if (savedVolume !== null) {
             mediaElement.volume = parseFloat(savedVolume);
         }
-        
+
         mediaElement.addEventListener('volumechange', () => {
             localStorage.setItem('mediaVolume', mediaElement.volume);
         });

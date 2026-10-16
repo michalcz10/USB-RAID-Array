@@ -14,6 +14,7 @@ error_reporting(E_ALL);
 ini_set('memory_limit', '512M');
 
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/workspace.php';
 $sftp = initializeSFTP();
 
 if (!isset($_GET['file'])) {
@@ -34,9 +35,9 @@ if (isset($_POST['createShare'])) {
     $conn = getDatabaseConnection();
     $stmt = $conn->prepare("INSERT INTO share (token, file_path, expiration, download_allowed) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("sssi", $token, $filePath, $expiration, $downloadAllowed);
-    
+
     if ($stmt->execute()) {
-        $shareUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . 
+        $shareUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" .
                     dirname($_SERVER['PHP_SELF']) . "/shared.php?token=$token";
 
         $_SESSION['shareCreated'] = true;
@@ -50,7 +51,7 @@ if (isset($_POST['createShare'])) {
         header("Location: view.php?file=" . urlencode($filePath) . "&shared=0");
         exit;
     }
-    
+
     $stmt->close();
     $conn->close();
 }
@@ -142,11 +143,11 @@ if (isset($_GET['stream'])) {
         $matches = [];
         if (preg_match('/bytes=(\d+)-(\d*)/', $rangeHeader, $matches)) {
             $start = intval($matches[1]);
-            
+
             if (!empty($matches[2])) {
                 $end = intval($matches[2]);
             }
-            
+
             $length = $end - $start + 1;
 
             header('HTTP/1.1 206 Partial Content');
@@ -193,18 +194,18 @@ if (isset($_GET['stream'])) {
 
             // Calculate adaptive chunk size
             $readSize = min($chunkSize, $bytesRemaining);
-            
+
             // Get chunk from SFTP
             $chunkData = $sftp->get($filePath, false, $currentPosition, $readSize);
-            
+
             if ($chunkData !== false) {
                 $bytesSent = strlen($chunkData);
-                
+
                 // Output chunk
                 echo $chunkData;
                 $bytesRemaining -= $bytesSent;
                 $currentPosition += $bytesSent;
-                
+
                 // Flush buffers
                 if (ob_get_level()) {
                     ob_flush();
@@ -253,34 +254,32 @@ if (isset($_GET['stream'])) {
 
 
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="<?= isset($_COOKIE['theme']) ? $_COOKIE['theme'] : 'light' ?>">
+<html lang="en">
 <head>
     <title>Media Viewer - <?= htmlspecialchars($fileName) ?></title>
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
-    <link rel="stylesheet" href="../../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/view.css">
-    <script src="../../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'content/ftp/css/view.css') ?>">
+    <script src="<?= workspaceAsset('../../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../../', 'js/ui.js') ?>" defer></script>
 </head>
-<body class="text-center">
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
-<div class="custom-container dark-box">
-    <header class="row border-bottom m-5">
-        <h1>Media Viewer</h1>
-        <div class="mb-3 p-3">
-            <a href="index.php?path=<?= urlencode(dirname($filePath)) ?>" class="btn btn-primary">Back to Files</a>
-        </div>
-    </header>
+<?php renderWorkspaceStart([
+    'root' => '../../',
+    'active' => 'files',
+    'section' => 'Media preview',
+    'eyebrow' => 'Media preview',
+    'title' => $fileName,
+    'description' => 'Preview your media, download a copy or create a shared link.',
+    'connected' => true,
+    'back' => 'index.php?path=' . urlencode(dirname($filePath)),
+    'class' => 'media-page',
+]); ?>
 
-    <section class="row">
+
+    <section class="content-panel media-panel">
         <article class="col-12">
             <div class="media-container position-relative">
                 <?php if ($isImage): ?>
@@ -305,13 +304,13 @@ if (isset($_GET['stream'])) {
                 <?php if (isset($_SESSION["downPer"]) && $_SESSION["downPer"] == true) : ?>
                 <a href="download.php?file=<?= urlencode($filePath) ?>" class="btn btn-success m-3">Download</a>
                 <?php endif; ?>
-                
+
                 <!-- Add Share Button -->
-                <button type="button" class="btn btn-info m-3" data-bs-toggle="modal" data-bs-target="#shareModal">
-                    <i class="bi bi-share"></i> Share
+                <button type="button" class="btn btn-info m-3" data-dialog="shareModal">
+                    <i class="ui-icon icon-share"></i> Share
                 </button>
             </div>
-            
+
             <!-- Share success message -->
             <?php if ($shareCreated): ?>
             <div class="alert alert-success mt-3">
@@ -319,7 +318,7 @@ if (isset($_GET['stream'])) {
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" id="shareUrl" value="<?= htmlspecialchars($shareUrl) ?>" readonly>
                     <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
-                        <i class="bi bi-clipboard"></i> Copy
+                        <i class="ui-icon icon-clipboard"></i> Copy
                     </button>
                 </div>
                 <p class="small text-muted">This link will expire on <?= date('F j, Y, g:i a', strtotime($shareExpiration)) ?></p>
@@ -356,33 +355,20 @@ if (isset($_GET['stream'])) {
         </article>
     </section>
 
-    <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-        <span class="text-muted">Developed by Michal Sedlák</span>
-        <div class="d-flex gap-3">
-            <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-                <img src="../../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-            </a>
-            <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-                <img src="../../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-            </a>
-        </div>
-    </footer>
-</div>
+    <?php renderWorkspaceEnd(); ?>
 
 <!-- Share Modal -->
-<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+<dialog class="modal" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="shareModalLabel">Share "<?= htmlspecialchars($fileName) ?>"</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dialog-close aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form method="post" action="">
                     <input type="hidden" name="filePath" value="<?= htmlspecialchars($filePath) ?>">
-                    
+
                     <div class="mb-3">
                         <label for="duration" class="form-label">Link expires after</label>
                         <select class="form-select" id="duration" name="duration">
@@ -393,45 +379,45 @@ if (isset($_GET['stream'])) {
                             <option value="720">30 days</option>
                         </select>
                     </div>
-                    
+
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="downloadAllowed" name="downloadAllowed">
                         <label class="form-check-label" for="downloadAllowed">Allow downloading</label>
                     </div>
-                    
+
                     <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                         <button type="submit" name="createShare" class="btn btn-primary">Create Share Link</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-</div>
+</dialog>
 
 <script>
 function copyShareUrl() {
     const shareUrl = document.getElementById('shareUrl');
     shareUrl.select();
     document.execCommand('copy');
-    
+
     // Show feedback
     const button = shareUrl.nextElementSibling;
     const originalText = button.innerHTML;
-    button.innerHTML = '<i class="bi bi-check"></i> Copied!';
-    
+    button.innerHTML = '<i class="ui-icon icon-check"></i> Copied!';
+
     setTimeout(() => {
         button.innerHTML = originalText;
     }, 2000);
 }
 </script>
 
-<script src="../../js/theme.js"></script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const mediaElement = document.querySelector('video, audio');
-    
+
     if (mediaElement) {
         // Restore volume from localStorage
         const savedVolume = localStorage.getItem('mediaVolume');

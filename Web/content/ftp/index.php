@@ -13,19 +13,20 @@
     error_reporting(E_ALL);
 
     require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/workspace.php';
     $sftp = initializeSFTP();
 
     $currentPath = isset($_GET['path']) ? normalizePath($_GET['path']) : $defaultPath;
     if (strpos($currentPath, $defaultPath) !== 0) {
         $currentPath = $defaultPath;
     }
-    
+
     if (!$sftp->chdir($currentPath)) {
         die("Failed to navigate to the selected folder: $currentPath");
     }
 
     $items = $sftp->nlist();
-	
+
     $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
     $videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
     $audioExtensions = ['mp3', 'wav', 'm4a', 'flac', 'aac'];
@@ -35,51 +36,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>FTP</title>
+    <title>Files · USB RAID</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="../../img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../css/bootstrap.css">
-    <link rel="stylesheet" href="../../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="../../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../../', 'content/ftp/css/index.css') ?>">
+    <script src="<?= workspaceAsset('../../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../../', 'js/ui.js') ?>" defer></script>
 </head>
-<body class="text-center">
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
-<div class="custom-container dark-box">
-<header class="row border-bottom m-5">
-    <h1>USB RAID Array</h1>
-    <div class="mb-3 p-3">
-        <a href="../logout.php" class="btn btn-danger">Logout</a>
-        <a href="../changepassword.php" class="btn btn-warning">Change Password</a>
-        <?php if (isset($_SESSION["admin"]) && $_SESSION["admin"] == true) { ?>
-            <a href="../adminpanel.php" class="btn btn-primary">Admin Panel</a>
-            <a href="serverstat.php" class="btn btn-primary">Server Status</a>
-        <?php } ?>
-    </div>
-</header>
-
-<section class="row">
-
-    <article class="col-8 border border-2 border-primary rounded p-2">
-        <div class="col">
-            <h4>Current Path: <?= htmlspecialchars($currentPath) ?></h4>
-        </div>
-
-        <div class="col">
+<?php renderWorkspaceStart([
+    'root' => '../../',
+    'active' => 'files',
+    'section' => 'Files',
+    'eyebrow' => 'Your remote storage',
+    'title' => 'All files',
+    'description' => 'Everything in its place. Browse, manage and transfer your files.',
+    'connected' => true,
+]); ?>
+        <nav class="pathbar" aria-label="Directory path"><a href="index.php" title="Home directory">⌂ <span>Home</span></a><?php
+        $relativePath = trim(substr($currentPath, strlen(rtrim($defaultPath, '/'))), '/');
+        $crumbPath = rtrim($defaultPath, '/');
+        foreach (array_filter(explode('/', $relativePath), 'strlen') as $segment):
+            $crumbPath .= '/' . $segment;
+        ?><span class="path-separator" aria-hidden="true">/</span><a href="?path=<?= urlencode($crumbPath) ?>"><?= htmlspecialchars($segment) ?></a><?php endforeach; ?><span class="path-label" title="<?= htmlspecialchars($currentPath) ?>"><?= htmlspecialchars($currentPath) ?></span></nav>
+        <section class="file-panel" aria-label="File browser">
+        <div class="browser-toolbar"><label class="search-field"><span aria-hidden="true">⌕</span><input id="fileSearch" type="search" placeholder="Search this folder…" aria-label="Search this folder"><kbd>/</kbd></label><select id="typeFilter" class="form-select" aria-label="Filter by type"><option value="all">All types</option><option value="folder">Folders</option><option value="file">Files</option></select></div>
+        <div class="file-content">
             <!-- Action Buttons -->
             <div class="action-buttons">
                 <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) { ?>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createFileModal">Create File</button>
-                    <button type="button" class="btn btn-success" onclick="document.getElementById('fileInput').click()">Upload Files</button>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDirModal">Create Directory</button>
-                    <button type="button" class="btn btn-info" onclick="document.getElementById('dirInput').click()">Upload Directory</button>
+                    <button type="button" class="btn" data-dialog="createFileModal">＋ New file</button>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">↑ Upload files</button>
+                    <button type="button" class="btn" data-dialog="createDirModal">＋ New folder</button>
+                    <button type="button" class="btn btn-info" onclick="document.getElementById('dirInput').click()">Upload folder</button>
                     <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
                     <input type="file" id="dirInput" webkitdirectory directory multiple style="display: none;" onchange="handleFileSelect(event)">
                 <?php } ?>
@@ -87,57 +78,57 @@
 
         <!-- Modal Forms -->
         <!-- Create Directory Dialog -->
-        <div class="modal fade" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel" aria-hidden="true">
+        <dialog class="modal" id="createDirModal" tabindex="-1" aria-labelledby="createDirModalLabel">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="createDirModalLabel">Create New Directory</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-dialog-close aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="dirName" class="form-label">Directory Name</label>
-                            <input type="text" class="form-control" id="dirName" placeholder="Enter directory name">
+                            <input type="text" class="form-control" id="dirName" autofocus placeholder="Enter directory name">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                         <button type="button" class="btn btn-primary" onclick="createDirectory()">Create</button>
                     </div>
                 </div>
             </div>
-        </div>
+        </dialog>
 
             <!-- Create File Dialog -->
-            <div class="modal fade" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel" aria-hidden="true">
+            <dialog class="modal" id="createFileModal" tabindex="-1" aria-labelledby="createFileModalLabel">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="createFileModalLabel">Create New File</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-dialog-close aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="fileName" class="form-label">File Name (with extension)</label>
-                                <input type="text" class="form-control" id="fileName" placeholder="example.txt">
+                                <input type="text" class="form-control" id="fileName" autofocus placeholder="example.txt">
                                 <div class="form-text">Supported extensions: .txt, .html, .css, .js, .php, etc.</div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                             <button type="button" class="btn btn-primary" onclick="createFile()">Create</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </dialog>
 
             <!-- Rename Confirmation Dialog -->
-            <div class="modal fade" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel" aria-hidden="true">
+            <dialog class="modal" id="renameModal" tabindex="-1" aria-labelledby="renameModalLabel">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="renameModalLabel">Rename Item</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-dialog-close aria-label="Close"></button>
                     </div>
                     <form method="POST" action="rename.php">
                         <div class="modal-body">
@@ -149,31 +140,31 @@
                             </div>
                             <div class="mb-3">
                                 <label for="newName" class="form-label">New Name:</label>
-                                <input type="text" class="form-control" id="newName" name="newName" required>
+                                <input type="text" class="form-control" id="newName" autofocus name="newName" required>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-dialog-close>Cancel</button>
                             <button type="submit" class="btn btn-primary">Rename</button>
                         </div>
                     </form>
                 </div>
             </div>
-            </div>
+            </dialog>
             <!-- End of Modal Forms -->
 
             <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) { ?>
                 <div class="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-                    Drop files or folders here to upload
+                    <span class="upload-symbol" aria-hidden="true">↑</span><span><strong>Drop files or folders here</strong><small>Or use the upload buttons to browse your device</small></span>
                 </div>
             <?php } ?>
 
-            <table>
+            <div class="file-table-scroll"><table class="file-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Size</th>
-                        <th>Actions</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -197,15 +188,14 @@
 
                     if ($currentPath !== $defaultPath) : ?>
                         <tr>
-                            <td colspan="3"><a class="text-danger" href="?path=<?= urlencode(dirname($currentPath)) ?>"><b>.. (Go Back)</b></a></td>
+                            <td colspan="3"><a class="text-danger" href="?path=<?= urlencode(dirname($currentPath)) ?>"><b>↑ Parent folder</b></a></td>
                         </tr>
                     <?php endif;
 
                     foreach ($directories as $directory) : ?>
-                        <tr>
-                            <td colspan="2">
-                                <a href="?path=<?= urlencode($currentPath . '/' . $directory) ?>"><?= htmlspecialchars($directory) ?>/</a>
-                            </td>
+                        <tr data-file-name="<?= htmlspecialchars($directory) ?>" data-kind="folder">
+                            <td><span class="file-icon folder-icon" aria-hidden="true">▰</span>
+                                <a href="?path=<?= urlencode($currentPath . '/' . $directory) ?>"><?= htmlspecialchars($directory) ?></a></td><td class="size-cell">—</td>
                             <td>
                                 <?php if (isset($_SESSION["delPer"]) && $_SESSION["delPer"] == true) : ?>
                                     <form method="POST" action="delete.php" style="display:inline;">
@@ -221,7 +211,7 @@
                                     </form>
                                 <?php endif; ?>
                                 <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) : ?>
-                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($directory)) ?>', '<?= htmlspecialchars(addslashes($currentPath . '/' . $directory)) ?>')">Rename</button>
+                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($directory)) ?>', '<?= htmlspecialchars(addslashes($currentPath . '/' . $directory)) ?>', true)">Rename</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -229,7 +219,7 @@
 
                     foreach ($files as $file) : ?>
                         <?php
-                        
+
                         $fileExtension = pathinfo($file, PATHINFO_EXTENSION);
                         $isPDF = strtolower($fileExtension) === 'pdf';
                         $isImage = in_array($fileExtension, $imageExtensions);
@@ -242,9 +232,8 @@
                             $isArchive = true;
                         }
                         ?>
-                        <tr>
-                            <td>
-                                
+                        <tr data-file-name="<?= htmlspecialchars($file) ?>" data-kind="file">
+                            <td><span class="file-icon" aria-hidden="true">▤</span>
                                 <?php if ($isMedia): ?>
                                 <a class="text-info-emphasis" href="view.php?file=<?= urlencode($currentPath . '/' . $file) ?>">
                                     <?= htmlspecialchars($file) ?>
@@ -301,36 +290,18 @@
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
-            </table>
+            </table></div>
+            <div id="emptySearch" class="empty-state" hidden><span aria-hidden="true">⌕</span><h3>No files to show</h3><p>Try another search or upload files to this folder.</p></div>
+            <div class="browser-status"><span id="fileCount" role="status"></span><span>Folders first · A–Z</span></div>
         </div>
-    </article>
+        </section>
+<?php renderWorkspaceEnd(); ?>
 
-    <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-    <span class="text-muted">Developed by Michal Sedlák</span>
-    <div class="d-flex gap-3">
-        <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-            <img src="../../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-            <img src="../../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-        </a>
-        <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-            <img src="../../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-            <img src="../../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-        </a>
-    </div>
-    </footer>
-    </div>
-    <script>
-        // Keep Bootstrap modals outside the filtered SFTP container. A parent
-        // backdrop-filter creates a stacking context that can block modal input.
-        document.querySelectorAll('.modal').forEach(function (modal) {
-            document.body.appendChild(modal);
-        });
-    </script>
     <script>
         // Pass PHP variables to JavaScript
-        var currentPath = "<?php echo $currentPath; ?>";
+        const currentPath = <?= json_encode($currentPath, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
-    <script src="js/index.js"></script>
+    <script src="<?= workspaceAsset('../../', 'content/ftp/js/index.js') ?>"></script>
 </body>
 </html>
 

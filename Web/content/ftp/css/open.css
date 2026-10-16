@@ -1,54 +1,6 @@
-.editor-container {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-#editor {
-    width: 100%;
-    min-height: 400px;
-    font-family: monospace;
-    padding: 10px;
-    white-space: pre;
-    overflow: auto;
-    resize: vertical;
-    tab-size: 4;
-    -moz-tab-size: 4;
-    padding-left: 55px; /* Make room for line numbers */
-}
-
-.line-numbers {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 45px;
-    text-align: right;
-    padding: 10px 5px 10px 0;
-    border-right: 1px solid #ccc;
-    color: #999;
-    user-select: none;
-    font-family: monospace;
-    overflow: hidden;
-    z-index: 1;
-    background-color: #f8f9fa; /* Light mode default */
-}
-
-[data-bs-theme="dark"] .line-numbers {
-    background-color: #212529; /* Dark mode background */
-    border-right-color: #495057; /* Darker border for dark mode */
-    color: #6c757d; /* Lighter text for dark mode */
-}
-
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.readonly-notice {
-    color: #dc3545;
-    font-weight: bold;
-    margin-left: 10px;
-}
+.editor-container { position:relative; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:20px; }
+#editor { width:100%; min-height:55vh; padding:16px; font:13px/1.65 ui-monospace,Consolas,monospace; white-space:pre; overflow:auto; resize:vertical; tab-size:4; border:0; border-radius:0; background:var(--bg); }
+.editor-container:has(.line-numbers) #editor { padding-left:64px; }
+.line-numbers { position:absolute; left:0; top:0; width:48px; text-align:right; padding:16px 10px 16px 0; border-right:1px solid var(--line); color:var(--muted); user-select:none; font:13px/1.65 ui-monospace,Consolas,monospace; overflow:hidden; z-index:1; background:var(--surface-alt); }
+.readonly-notice { color:var(--muted); font-size:12px; }
+.editor-page .d-flex { flex-wrap:wrap; gap:8px; }

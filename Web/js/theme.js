@@ -1,40 +1,26 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const themeText = document.getElementById('themeText');
-    const themeIcon = themeToggle.querySelector('.bi');
-    
+(() => {
+    const preference = window.matchMedia('(prefers-color-scheme: dark)');
+    let saved;
+    try { saved = localStorage.getItem('theme'); } catch (_) { /* Storage may be disabled. */ }
     function setTheme(theme) {
-        html.setAttribute('data-bs-theme', theme);
-        document.body.classList.remove('theme-light', 'theme-dark');
-        document.body.classList.add('theme-' + theme);
-        localStorage.setItem('theme', theme);
-        
-        if (theme === 'dark') {
-            themeText.textContent = 'Light Mode';
-            themeIcon.className = 'bi bi-sun';
-            themeToggle.classList.remove('btn-dark');
-            themeToggle.classList.add('btn-light');
-        } else {
-            themeText.textContent = 'Dark Mode';
-            themeIcon.className = 'bi bi-moon';
-            themeToggle.classList.remove('btn-light');
-            themeToggle.classList.add('btn-dark');
+        document.documentElement.dataset.theme = theme;
+        const button = document.getElementById('themeToggle');
+        if (button) {
+            button.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
+            const label = document.getElementById('themeText');
+            if (label) label.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+            const icon = button.querySelector('i');
+            if (icon) { icon.textContent = theme === 'dark' ? '☀' : '◐'; icon.setAttribute('aria-hidden', 'true'); }
         }
     }
-    
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-        setTheme(savedTheme);
-    } else {
-        setTheme(prefersDark ? 'dark' : 'light');
-    }
-    
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = html.getAttribute('data-bs-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
+    setTheme(saved === 'dark' || saved === 'light' ? saved : preference.matches ? 'dark' : 'light');
+    document.addEventListener('DOMContentLoaded', () => {
+        setTheme(document.documentElement.dataset.theme);
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            saved = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            setTheme(saved);
+            try { localStorage.setItem('theme', saved); } catch (_) { /* Keep this session usable. */ }
+        });
     });
-});
+    preference.addEventListener('change', () => { if (saved !== 'dark' && saved !== 'light') setTheme(preference.matches ? 'dark' : 'light'); });
+})();

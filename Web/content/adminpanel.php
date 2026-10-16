@@ -10,6 +10,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/workspace.php';
 // $username = "UNAME";
 // $password = "PSWD";
 // $db = "usbraidlogin";
@@ -136,15 +137,15 @@ function CheckPassword($password) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Panel</title>
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/adminpanel.css">
-    <script src="../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'content/css/adminpanel.css') ?>">
     <script>
         function confirmDelete(uname) {
             if (confirm('Are you sure you want to delete this user?')) {
@@ -152,45 +153,39 @@ function CheckPassword($password) {
             }
         }
     </script>
+    <script src="<?= workspaceAsset('../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../', 'js/ui.js') ?>" defer></script>
 </head>
-<body class="text-center">
-<div class="d-flex justify-content-end p-3">
-    <button id="themeToggle" class="btn btn-sm theme-toggle">
-        <i class="bi"></i>
-        <span id="themeText"></span>
-    </button>
-</div>
+<?php renderWorkspaceStart([
+    'root' => '../',
+    'active' => 'users',
+    'section' => 'User management',
+    'eyebrow' => 'Workspace administration',
+    'title' => 'User management',
+    'description' => 'Manage accounts, storage locations and access permissions.',
+    'class' => 'users-page',
+]); ?>
 
-<div class="custom-container dark-box">
-    <header class="row border-bottom m-5">
-        <h1>USB RAID Array</h1>
-        <div class="mb-3 p-3">
-            <a href="logout.php" class="btn btn-danger">Logout</a>
-            <a href="changepassword.php" class="btn btn-warning">Change Password</a>
-            <a href="ftp/index.php" class="btn btn-primary">SFTP</a>
-            <a href="ftp/serverstat.php" class="btn btn-primary">Server Status</a>
-        </div>
-    </header>
-    <section class="row">
-        <article class="col border border-2 border-primary rounded p-2 surface-panel">
-            <h2 class="mb-4">User Management</h2>
+    <section class="users-layout">
+
             <?php if ($message): ?>
                 <div class="alert alert-<?php echo $message_type === 'success' ? 'success' : 'danger'; ?>">
                     <?php echo htmlspecialchars($message); ?>
                 </div>
             <?php endif; ?>
-            <form method="POST" action="" class="mb-4 add-user-form">
+<div class="content-panel user-create"><div class="panel-heading"><h2>Add a member</h2><p>Set up an account and choose its access.</p></div>
+            <form method="POST" action="" class="add-user-form">
                 <div class="mb-3">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="uname" class="form-control" placeholder="Username" required>
+                    <label class="form-label" for="memberUsername">Username</label>
+                    <input type="text" name="uname" id="memberUsername" class="form-control" placeholder="Username" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="pswd" class="form-control" placeholder="Password" required>
+                    <label class="form-label" for="memberPassword">Password</label>
+                    <input type="password" name="pswd" id="memberPassword" class="form-control" placeholder="Password" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Default Path</label>
-                    <input type="text" name="defPath" class="form-control" placeholder="Default Path (e.g., /mnt/raid)" required>
+                    <label class="form-label" for="memberPath">Default path</label>
+                    <input type="text" name="defPath" id="memberPath" class="form-control" placeholder="Default Path (e.g., /mnt/raid)" required>
                 </div>
                 <div class="d-flex flex-column align-items-center mb-3">
                     <div class="form-check mb-2">
@@ -211,9 +206,11 @@ function CheckPassword($password) {
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Add User</button>
-            </form>
-            <h3 class="mb-3">Users List</h3>
-            <table class="table table-bordered">
+            </form></div>
+<div class="content-panel user-list"><div class="panel-heading"><h2>Workspace members</h2><p>Accounts and permissions for your storage.</p></div>
+
+
+            <div class="table-scroll"><table class="table users-table">
                 <thead class="table-dark">
                     <tr>
                         <th>Username</th>
@@ -240,25 +237,10 @@ function CheckPassword($password) {
                         </tr>
                     <?php } ?>
                 </tbody>
-            </table>
-        </article>
-    </section>
-    <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-        <span class="text-muted">Developed by Michal Sedlák</span>
-        <div class="d-flex gap-3">
-            <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-                <img src="../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-            </a>
-            <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                <img src="../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-                <img src="../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-            </a>
+            </table></div>
         </div>
-    </footer>
-        
-    <script src="../js/theme.js"></script>
-</div>
+    </section>
+    <?php renderWorkspaceEnd(); ?>
 </body>
 </html>
 <?php

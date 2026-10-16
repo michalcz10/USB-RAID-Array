@@ -7,6 +7,7 @@ if (!isset($_SESSION['uname'])) {
 }
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../includes/workspace.php';
 // $username = "UNAME";
 // $password = "PSWD";
 // $db = "usbraidlogin";
@@ -93,82 +94,58 @@ function CheckPassword($password) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Change Password</title>
     <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="../css/modern.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/changepassword.css">
-    <script src="../js/bootstrap.bundle.js"></script>
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'css/modern.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'css/workspace.css') ?>">
+    <link rel="stylesheet" href="<?= workspaceAsset('../', 'content/css/changepassword.css') ?>">
+    <script src="<?= workspaceAsset('../', 'js/theme.js') ?>"></script>
+    <script src="<?= workspaceAsset('../', 'js/ui.js') ?>" defer></script>
 </head>
-<body class="text-center">
-    <div class="d-flex justify-content-end p-3">
-        <button id="themeToggle" class="btn btn-sm theme-toggle">
-            <i class="bi"></i>
-            <span id="themeText"></span>
-        </button>
-    </div>
-    
-    <div class="custom-container dark-box">
-        <header class="row border-bottom my-3 my-md-5">
-            <h1>USB RAID Array</h1>
-            <div class="mb-3 p-3">
-                <div class="btn-group-responsive">
-                    <a href="logout.php" class="btn btn-danger">Logout</a>
-                    <a href="ftp/index.php" class="btn btn-primary">Back to Files</a>
-                    <?php if (isset($_SESSION["admin"]) && $_SESSION["admin"] == true) { ?>
-                        <a href="adminpanel.php" class="btn btn-primary">Admin Panel</a>
-                    <?php } ?>
-                </div>
-            </div>
-        </header>
-        
-        <section class="row content-section">
-            <article class="col-12 border border-2 border-primary rounded p-2 p-md-4 surface-panel">
-                <h2 class="mb-4">Change Password</h2>
-                
+<?php renderWorkspaceStart([
+    'root' => '../',
+    'active' => 'account',
+    'section' => 'Account settings',
+    'eyebrow' => 'Your account',
+    'title' => 'Account settings',
+    'description' => 'Keep your workspace account secure and up to date.',
+    'class' => 'account-page',
+]); ?>
+
+
+        <section class="account-layout">
+            <article class="content-panel">
+                <div class="panel-heading"><h2>Change password</h2><p>Choose a strong password to protect your files.</p></div>
+
                 <?php if ($message): ?>
                 <div class="alert alert-<?php echo $messageType; ?> mb-4">
                     <?php echo $message; ?>
                 </div>
                 <?php endif; ?>
-                
+
                 <form method="POST" action="" class="mb-4 change-password-form">
                     <div class="mb-3">
-                        <label class="form-label">Current Password</label>
-                        <input type="password" name="current_password" class="form-control" required>
+                        <label class="form-label" for="currentPassword">Current password</label>
+                        <input type="password" id="currentPassword" autocomplete="current-password" name="current_password" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">New Password</label>
-                        <input type="password" name="new_password" class="form-control" required>
+                        <label class="form-label" for="newPassword">New password</label>
+                        <input type="password" id="newPassword" autocomplete="new-password" name="new_password" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Confirm New Password</label>
-                        <input type="password" name="confirm_password" class="form-control" required>
+                        <label class="form-label" for="confirmPassword">Confirm new password</label>
+                        <input type="password" id="confirmPassword" autocomplete="new-password" name="confirm_password" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Change Password</button>
                 </form>
             </article>
+<aside class="account-help"><span class="eyebrow">Password requirements</span><h3>A little extra protection</h3><p>Use at least 8 characters, one uppercase letter and one number.</p><p>You can return to your files at any time using the workspace navigation.</p></aside>
         </section>
-        
-        <footer class="d-flex flex-column justify-content-center align-items-center p-3 border-top gap-3 m-3">
-            <span class="text-muted">Developed by Michal Sedlák</span>
-            <div class="d-flex gap-3 flex-wrap justify-content-center">
-                <a href="https://github.com/michalcz10/USB-RAID-Array" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                    <img src="../img/GitHub_Logo.png" alt="GitHub Logo" class="img-fluid hover-effect light-logo" style="height: 32px;">
-                    <img src="../img/GitHub_Logo_White.png" alt="GitHub Logo" class="img-fluid hover-effect dark-logo" style="height: 32px;">
-                </a>
-                <a href="https://app.freelo.io/public/shared-link-view/?a=81efbcb4df761b3f29cdc80855b41e6d&b=4519c717f0729cc8e953af661e9dc981" class="text-decoration-none" target="_blank" rel="noopener noreferrer">
-                    <img src="../img/freelo-logo-rgb.png" alt="Freelo Logo" class="img-fluid hover-effect light-logo" style="height: 24px;">
-                    <img src="../img/freelo-logo-rgb-on-dark.png" alt="Freelo Logo" class="img-fluid hover-effect dark-logo" style="height: 24px;">
-                </a>
-            </div>
-        </footer>
-        
-        <script src="../js/theme.js"></script>
-    </div>
+
+        <?php renderWorkspaceEnd(); ?>
 </body>
 </html>
