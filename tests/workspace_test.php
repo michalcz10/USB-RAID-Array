@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Web/includes/workspace.php';
+require_once __DIR__ . '/../Web/includes/remotepaths.php';
 require_once __DIR__ . '/../Web/content/ftp/lib/serverstats.php';
 set_error_handler(function ($severity, $message, $file, $line) {
     if (error_reporting() & $severity) throw new ErrorException($message, 0, $severity, $file, $line);
@@ -8,9 +9,8 @@ function expectWorkspace($condition, $message) {
     if (!$condition) throw new RuntimeException($message);
 }
 
-function renderWorkspaceFixture($name, $admin = true) {
+function renderWorkspaceFixture($name, $admin = true, $defaultPath = '/mnt/raid', $currentPath = '/mnt/raid/Workspace') {
     $_SESSION = ['uname' => 'michal', 'admin' => $admin, 'upPer' => true, 'downPer' => true, 'delPer' => true];
-    $defaultPath = '/mnt/raid'; $currentPath = '/mnt/raid/Workspace';
     $filePath = $currentPath . '/Example.pdf'; $fileName = basename($filePath); $parentDir = $currentPath;
     $fileExtension = 'png'; $fileSize = 245760; $mimeType = 'image/png';
     $isImage = true; $isVideo = false; $isAudio = false;
@@ -75,6 +75,12 @@ foreach ($pages as $name) {
 $member = renderWorkspaceFixture('index', false);
 expectWorkspace(strpos($member, 'User management') === false && strpos($member, '> Server status</a>') === false, 'Member navigation omits admin pages');
 expectWorkspace(strpos($member, 'Account settings') !== false, 'Members can access account settings');
+$rootChild = renderWorkspaceFixture('index', true, '/', '/etc');
+expectWorkspace(strpos($rootChild, 'href="?path=%2F"') !== false, 'Parent link from a root child uses a POSIX slash');
+expectWorkspace(strpos($rootChild, '%5C') === false, 'No Windows separator in remote links');
+$root = renderWorkspaceFixture('index', true, '/', '/');
+expectWorkspace(strpos($root, 'Parent folder') === false, 'Root has no parent-folder link');
+expectWorkspace(strpos($root, 'href="?path=%2FDocuments"') !== false, 'Root children use a single leading slash');
 if ($preview) {
     // One-page PDF fixture for viewer navigation and fullscreen checks.
     $stream = "BT /F1 24 Tf 60 700 Td (USB RAID workspace preview) Tj ET";

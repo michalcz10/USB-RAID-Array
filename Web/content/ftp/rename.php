@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Missing required information for renaming.");
     }
 
-    $dirPath = dirname($oldPath);
+    $dirPath = remoteDirname($oldPath);
     $oldName = basename($oldPath);
 
     $newPath = $dirPath . '/' . $newName;

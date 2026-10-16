@@ -13,11 +13,12 @@
     error_reporting(E_ALL);
 
     require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../includes/workspace.php';
+    require_once __DIR__ . '/../../includes/workspace.php';
     $sftp = initializeSFTP();
 
+    $defaultPath = normalizePath($defaultPath);
     $currentPath = isset($_GET['path']) ? normalizePath($_GET['path']) : $defaultPath;
-    if (strpos($currentPath, $defaultPath) !== 0) {
+    if ($currentPath !== $defaultPath && strpos($currentPath, rtrim($defaultPath, '/') . '/') !== 0) {
         $currentPath = $defaultPath;
     }
 
@@ -188,30 +189,30 @@ require_once __DIR__ . '/../../includes/workspace.php';
 
                     if ($currentPath !== $defaultPath) : ?>
                         <tr>
-                            <td colspan="3"><a class="text-danger" href="?path=<?= urlencode(dirname($currentPath)) ?>"><b>↑ Parent folder</b></a></td>
+                            <td colspan="3"><a class="text-danger" href="?path=<?= urlencode(remoteDirname($currentPath)) ?>"><b>↑ Parent folder</b></a></td>
                         </tr>
                     <?php endif;
 
                     foreach ($directories as $directory) : ?>
                         <tr data-file-name="<?= htmlspecialchars($directory) ?>" data-kind="folder">
                             <td><span class="file-icon folder-icon" aria-hidden="true">▰</span>
-                                <a href="?path=<?= urlencode($currentPath . '/' . $directory) ?>"><?= htmlspecialchars($directory) ?></a></td><td class="size-cell">—</td>
+                                <a href="?path=<?= urlencode(rtrim($currentPath, '/') . '/' . $directory) ?>"><?= htmlspecialchars($directory) ?></a></td><td class="size-cell">—</td>
                             <td>
                                 <?php if (isset($_SESSION["delPer"]) && $_SESSION["delPer"] == true) : ?>
                                     <form method="POST" action="delete.php" style="display:inline;">
-                                        <input type="hidden" name="delete" value="<?= htmlspecialchars($currentPath . '/' . $directory) ?>">
+                                        <input type="hidden" name="delete" value="<?= htmlspecialchars(rtrim($currentPath, '/') . '/' . $directory) ?>">
                                         <button type="submit" class="btn btn-danger mt-1 mb-1" onclick="confirmDelete(event)">Delete</button>
                                     </form>
                                 <?php endif; ?>
 
                                 <?php if (isset($_SESSION["downPer"]) && $_SESSION["downPer"] == true) : ?>
                                     <form method="POST" action="download.php" style="display:inline;">
-                                        <input type="hidden" name="file" value="<?= htmlspecialchars($currentPath . '/' . $directory) ?>">
+                                        <input type="hidden" name="file" value="<?= htmlspecialchars(rtrim($currentPath, '/') . '/' . $directory) ?>">
                                         <button type="submit" class="btn btn-success mt-1 mb-1">Download</button>
                                     </form>
                                 <?php endif; ?>
                                 <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) : ?>
-                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($directory)) ?>', '<?= htmlspecialchars(addslashes($currentPath . '/' . $directory)) ?>', true)">Rename</button>
+                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($directory)) ?>', '<?= htmlspecialchars(addslashes(rtrim($currentPath, '/') . '/' . $directory)) ?>', true)">Rename</button>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -235,7 +236,7 @@ require_once __DIR__ . '/../../includes/workspace.php';
                         <tr data-file-name="<?= htmlspecialchars($file) ?>" data-kind="file">
                             <td><span class="file-icon" aria-hidden="true">▤</span>
                                 <?php if ($isMedia): ?>
-                                <a class="text-info-emphasis" href="view.php?file=<?= urlencode($currentPath . '/' . $file) ?>">
+                                <a class="text-info-emphasis" href="view.php?file=<?= urlencode(rtrim($currentPath, '/') . '/' . $file) ?>">
                                     <?= htmlspecialchars($file) ?>
                                 </a>
                                 <?php if ($isImage): ?>
@@ -246,12 +247,12 @@ require_once __DIR__ . '/../../includes/workspace.php';
                                     <span class="badge bg-info rounded-pill">Audio</span>
                                 <?php endif; ?>
                                 <?php elseif ($isEditable): ?>
-                                    <a class="text-warning-emphasis" href="open.php?file=<?= urlencode($currentPath . '/' . $file) ?>">
+                                    <a class="text-warning-emphasis" href="open.php?file=<?= urlencode(rtrim($currentPath, '/') . '/' . $file) ?>">
                                         <?= htmlspecialchars($file) ?>
                                     </a>
                                     <span class="badge bg-secondary rounded-pill"><?= htmlspecialchars($fileExtension) ?></span>
                                     <?php elseif ($isPDF): ?>
-                                        <a class="text-info-emphasis" href="pdf.php?file=<?= urlencode($currentPath . '/' . $file) ?>&type=pdf">
+                                        <a class="text-info-emphasis" href="pdf.php?file=<?= urlencode(rtrim($currentPath, '/') . '/' . $file) ?>&type=pdf">
                                             <?= htmlspecialchars($file) ?>
                                         </a>
                                         <span class="badge bg-danger rounded-pill">PDF</span>
@@ -261,28 +262,28 @@ require_once __DIR__ . '/../../includes/workspace.php';
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <span class="text"><?= formatBytes($sftp->stat($currentPath . '/' . $file)['size']) ?></span>
+                                <span class="text"><?= formatBytes($sftp->stat(rtrim($currentPath, '/') . '/' . $file)['size']) ?></span>
                             </td>
                             <td>
                                 <?php if (isset($_SESSION["delPer"]) && $_SESSION["delPer"] == true) : ?>
                                     <form method="POST" action="delete.php" style="display:inline;">
-                                        <input type="hidden" name="delete" value="<?= htmlspecialchars($currentPath . '/' . $file) ?>">
+                                        <input type="hidden" name="delete" value="<?= htmlspecialchars(rtrim($currentPath, '/') . '/' . $file) ?>">
                                         <button type="submit" class="btn btn-danger mt-1 mb-1" onclick="confirmDelete(event)">Delete</button>
                                     </form>
                                 <?php endif; ?>
 
                                 <?php if (isset($_SESSION["downPer"]) && $_SESSION["downPer"] == true) : ?>
                                     <form method="POST" action="download.php" style="display:inline;">
-                                        <input type="hidden" name="file" value="<?= htmlspecialchars($currentPath . '/' . $file) ?>">
+                                        <input type="hidden" name="file" value="<?= htmlspecialchars(rtrim($currentPath, '/') . '/' . $file) ?>">
                                         <button type="submit" class="btn btn-success mt-1 mb-1">Download</button>
                                     </form>
                                 <?php endif; ?>
                                 <?php if (isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) : ?>
-                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($file)) ?>', '<?= htmlspecialchars(addslashes($currentPath . '/' . $file)) ?>')">Rename</button>
+                                    <button type="button" class="btn btn-warning mt-1 mb-1" onclick="openRenameModal('<?= htmlspecialchars(addslashes($file)) ?>', '<?= htmlspecialchars(addslashes(rtrim($currentPath, '/') . '/' . $file)) ?>')">Rename</button>
                                 <?php endif; ?>
                                 <?php if ($isArchive && isset($_SESSION["upPer"]) && $_SESSION["upPer"] == true) : ?>
                                     <form method="POST" action="extract.php" style="display:inline;">
-                                        <input type="hidden" name="archive" value="<?= htmlspecialchars($currentPath . '/' . $file) ?>">
+                                        <input type="hidden" name="archive" value="<?= htmlspecialchars(rtrim($currentPath, '/') . '/' . $file) ?>">
                                         <button type="submit" class="btn btn-info mt-1 mb-1">Extract</button>
                                     </form>
                                 <?php endif; ?>

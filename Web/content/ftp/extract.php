@@ -24,7 +24,7 @@ $sftp = initializeSFTP();
 // Process extraction request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive'])) {
     $archivePath = $_POST['archive'];
-    $dirPath = dirname($archivePath);
+    $dirPath = remoteDirname($archivePath);
     $archiveName = basename($archivePath);
     $extension = pathinfo($archiveName, PATHINFO_EXTENSION);
     

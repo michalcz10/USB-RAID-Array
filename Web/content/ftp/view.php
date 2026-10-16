@@ -38,7 +38,7 @@ if (isset($_POST['createShare'])) {
 
     if ($stmt->execute()) {
         $shareUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" .
-                    dirname($_SERVER['PHP_SELF']) . "/shared.php?token=$token";
+                    remoteDirname($_SERVER['PHP_SELF']) . "/shared.php?token=$token";
 
         $_SESSION['shareCreated'] = true;
         $_SESSION['shareUrl'] = $shareUrl;
@@ -274,7 +274,7 @@ if (isset($_GET['stream'])) {
     'title' => $fileName,
     'description' => 'Preview your media, download a copy or create a shared link.',
     'connected' => true,
-    'back' => 'index.php?path=' . urlencode(dirname($filePath)),
+    'back' => 'index.php?path=' . urlencode(remoteDirname($filePath)),
     'class' => 'media-page',
 ]); ?>
 

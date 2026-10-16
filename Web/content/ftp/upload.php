@@ -20,7 +20,7 @@ function createDirectoryRecursive($sftp, $path) {
         return true;
     }
     
-    $parent = dirname($path);
+    $parent = remoteDirname($path);
     if ($parent != '/' && !$sftp->is_dir($parent)) {
         createDirectoryRecursive($sftp, $parent);
     }
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($relativePath)) {
             $fileName = basename($relativePath);
 
-            $dirPart = dirname($relativePath);
+            $dirPart = remoteDirname($relativePath);
             if ($dirPart !== '.' && $dirPart !== '') {
                 $remoteDirPath = $currentPath . '/' . $dirPart;
 

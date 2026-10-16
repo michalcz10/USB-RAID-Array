@@ -41,7 +41,7 @@ try {
             $fullRemotePath = rtrim($currentPath, '/') . '/' . $file;
             
             $baseDirName = basename($remoteBasePath);
-            $relPathFromBase = substr($fullRemotePath, strlen(dirname($remoteBasePath)) + 1);
+            $relPathFromBase = substr($fullRemotePath, strlen(rtrim(remoteDirname($remoteBasePath), '/')) + 1);
             file_put_contents($logFile, "Processing: $fullRemotePath (relative: $relPathFromBase)\n", FILE_APPEND);
             
             $isDir = $sftp->is_dir($fullRemotePath);

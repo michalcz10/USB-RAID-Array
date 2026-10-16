@@ -3,6 +3,7 @@
 
 // Autoload dependencies (phpseclib)
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../includes/remotepaths.php';
 
 use phpseclib3\Net\SFTP;
 use phpseclib3\Net\SSH2;
@@ -56,17 +57,4 @@ function getSSHConnection(): SSH2 {
     return $ssh;
 }
 
-/** Utility: Normalise a path */
-function normalizePath(string $path): string {
-    $parts = array_filter(explode('/', $path), fn($part) => $part !== '' && $part !== '.');
-    $stack = [];
-    foreach ($parts as $part) {
-        if ($part === '..') {
-            array_pop($stack);
-        } else {
-            $stack[] = $part;
-        }
-    }
-    return '/' . implode('/', $stack);
-}
 ?>

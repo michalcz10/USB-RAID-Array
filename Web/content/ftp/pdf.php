@@ -134,7 +134,7 @@ if (isset($_GET['stream'])) {
     'title' => $fileName,
     'description' => 'Browse your document without leaving the workspace.',
     'connected' => true,
-    'back' => 'index.php?path=' . urlencode(dirname($filePath)),
+    'back' => 'index.php?path=' . urlencode(remoteDirname($filePath)),
     'class' => 'pdf-page',
 ]); ?>
 

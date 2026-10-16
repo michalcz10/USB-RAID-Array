@@ -52,7 +52,7 @@ if (!empty($filePath) && $sftp->file_exists($filePath) && !$sftp->is_dir($filePa
 
 $showLineNumbers = in_array(strtolower($extension), ['php', 'js', 'html', 'css', 'py', 'java', 'c', 'cpp', 'h', 'hpp', 'rb', 'sh', 'xml', 'json']);
 
-$parentDir = dirname($filePath);
+$parentDir = remoteDirname($filePath);
 ?>
 <!DOCTYPE html>
 <html lang="en">

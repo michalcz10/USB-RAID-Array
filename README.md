@@ -105,7 +105,8 @@ USB-RAID-Array/
 │   └── ...                  # původní technická dokumentace a podklady
 ├── tests/
 │   ├── workspace_test.php
-│   └── serverstats_test.php
+│   ├── serverstats_test.php
+│   └── remotepaths_test.php
 └── Web/
     ├── index.php            # přihlášení
     ├── config/config.php    # databáze, SFTP a SSH
@@ -127,6 +128,7 @@ Z kořene repozitáře:
 ```sh
 php tests/workspace_test.php
 php tests/serverstats_test.php
+php tests/remotepaths_test.php
 node --check Web/js/theme.js
 node --check Web/js/ui.js
 node --check Web/content/ftp/js/index.js

@@ -5,7 +5,7 @@ $sftp = initializeSFTP();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
     $itemToDelete = $_POST['delete'];
-    $parentDir = dirname($itemToDelete);
+    $parentDir = remoteDirname($itemToDelete);
 
     if ($parentDir === '/' || $parentDir === '.') {
         $parentDir = $defaultPath;
